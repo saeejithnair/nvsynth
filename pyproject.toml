@@ -1,0 +1,7 @@
+[project]
+# Support Python 3.7 only.
+requires-python = "==3.7"
+
+[tool.ruff]
+src = ["foodverse", "scripts", "tests", "configs"]
+target-version = "py37"

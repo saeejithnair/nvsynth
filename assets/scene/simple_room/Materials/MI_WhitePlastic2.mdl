@@ -1,0 +1,65 @@
+mdl 1.3;
+
+import math::*;
+import state::*;
+import tex::*;
+import anno::*;
+using OmniUe4Function import *;
+using OmniUe4Base import *;
+
+export annotation sampler_color();
+export annotation sampler_normal();
+export annotation sampler_grayscale();
+export annotation sampler_alpha();
+export annotation sampler_masks();
+export annotation sampler_distancefield();
+export annotation dither_masked_off();
+export annotation world_space_normal();
+
+export material MI_WhitePlastic2(
+	float Texture_Tiling = 1.0,
+	uniform texture_2d Normal = texture_2d("./Textures/WhitePlastic_Normal.png",::tex::gamma_linear)
+	[[sampler_normal()]],
+	float Albedo_Brightness = 0.6,
+	uniform texture_2d Albedo = texture_2d("./Textures/WhitePlastic_Color.png",::tex::gamma_srgb)
+	[[sampler_color()]],
+	float Roughness = 1.1,
+	uniform texture_2d Roughness_tp = texture_2d("./Textures/WhitePlastic_Rough.png",::tex::gamma_linear)
+	[[sampler_color()]])
+ = 
+	let {
+	float3 WorldPositionOffset_mdl = float3(0.0,0.0,0.0);
+	float2 CustomizedUV0_mdl = float2(state::texture_coordinate(0).x,1.0-state::texture_coordinate(0).y);
+
+	float Local0 = (-1.0 + 0.5);
+	float Local1 = (1.0 + 0.5);
+	float Local2 = math::lerp(float4(float3(float2(Local0,Local1).x,float2(Local0,Local1).y,Local0).x,float3(float2(Local0,Local1).x,float2(Local0,Local1).y,Local0).y,float3(float2(Local0,Local1).x,float2(Local0,Local1).y,Local0).z,Local1).x,float4(float3(float2(Local0,Local1).x,float2(Local0,Local1).y,Local0).x,float3(float2(Local0,Local1).x,float2(Local0,Local1).y,Local0).y,float3(float2(Local0,Local1).x,float2(Local0,Local1).y,Local0).z,Local1).y,CustomizedUV0_mdl.x);
+	float Local3 = math::lerp(float4(float3(float2(Local0,Local1).x,float2(Local0,Local1).y,Local0).x,float3(float2(Local0,Local1).x,float2(Local0,Local1).y,Local0).y,float3(float2(Local0,Local1).x,float2(Local0,Local1).y,Local0).z,Local1).z,float4(float3(float2(Local0,Local1).x,float2(Local0,Local1).y,Local0).x,float3(float2(Local0,Local1).x,float2(Local0,Local1).y,Local0).y,float3(float2(Local0,Local1).x,float2(Local0,Local1).y,Local0).z,Local1).w,CustomizedUV0_mdl.y);
+	float2 Local4 = (float2(Local2,Local3) * Texture_Tiling);
+	float4 Local5 = ::unpack_normal_map(tex::lookup_float4(Normal,float2(Local4.x,1.0-Local4.y),tex::wrap_repeat,tex::wrap_repeat));
+
+	float3 Normal_mdl = float3(Local5.x,Local5.y,Local5.z);
+
+	float4 Local6 = tex::lookup_float4(Albedo,float2(Local4.x,1.0-Local4.y),tex::wrap_repeat,tex::wrap_repeat);
+	float3 Local7 = (Albedo_Brightness * float3(Local6.x,Local6.y,Local6.z));
+	float4 Local8 = tex::lookup_float4(Roughness_tp,float2(Local4.x,1.0-Local4.y),tex::wrap_repeat,tex::wrap_repeat);
+	float3 Local9 = (Roughness * float3(Local8.x,Local8.y,Local8.z));
+
+	float3 EmissiveColor_mdl = float3(0.0,0.0,0.0);
+	float OpacityMask_mdl = 1.0;
+	float3 BaseColor_mdl = Local7;
+	float Metallic_mdl = 0.0;
+	float Specular_mdl = 0.5;
+	float Roughness_mdl = Local9.x;
+
+	} in
+		::OmniUe4Base(
+			base_color: BaseColor_mdl,
+			metallic: Metallic_mdl,
+			roughness: Roughness_mdl,
+			specular: Specular_mdl,
+			normal: Normal_mdl,
+			opacity: OpacityMask_mdl,
+			emissive_color: EmissiveColor_mdl,
+			displacement: WorldPositionOffset_mdl,
+			two_sided: false);

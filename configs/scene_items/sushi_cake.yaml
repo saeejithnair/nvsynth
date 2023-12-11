@@ -1,0 +1,120 @@
+# tyro YAML.
+!dataclass:SceneItems
+food_items:
+procedural_items:
+  - !dataclass:CircularPlacement
+    description: Layer 1, innermost ring
+    height: 0
+    increment_angle: 90
+    model_label: id_36_costco_salad_sushi_roll_1_30g
+    num_items: 4
+    orientation: !dataclass:EulerOrientation
+      pitch: 0
+      roll: 90
+      yaw: 0
+    radius: 0.02
+    start_angle: 0
+
+  - !dataclass:CircularPlacement
+    description: Layer 1, middle ring
+    height: 0
+    increment_angle: 45
+    model_label: id_36_costco_salad_sushi_roll_1_30g
+    num_items: 8
+    orientation: !dataclass:EulerOrientation
+      pitch: 0
+      roll: 90
+      yaw: 0
+    radius: 0.055
+    start_angle: 0
+
+  - !dataclass:CircularPlacement
+    description: Layer 1, outermost ring
+    height: 0
+    increment_angle: 22.5
+    model_label: id_36_costco_salad_sushi_roll_1_30g
+    num_items: 16
+    orientation: !dataclass:EulerOrientation
+      pitch: 0
+      roll: 90
+      yaw: 0
+    radius: 0.09
+    start_angle: 22.5
+
+  - !dataclass:CircularPlacement
+    description: Layer 2, innermost ring
+    height: 0.025
+    increment_angle: 120
+    model_label: id_45_costco_california_sushi_roll_5_24g
+    num_items: 3
+    orientation: !dataclass:EulerOrientation
+      pitch: 0
+      roll: 90
+      yaw: 0
+    radius: 0.0025
+    start_angle: 0
+
+  - !dataclass:CircularPlacement
+    description: Layer 2, middle ring
+    height: 0.025
+    increment_angle: 60
+    model_label: id_45_costco_california_sushi_roll_5_24g
+    num_items: 6
+    orientation: !dataclass:EulerOrientation
+      pitch: 0
+      roll: 90
+      yaw: 0
+    radius: 0.0375
+    start_angle: 45
+
+  - !dataclass:CircularPlacement
+    description: Layer 2, outermost ring
+    height: 0.025
+    increment_angle: 30
+    model_label: id_45_costco_california_sushi_roll_5_24g
+    num_items: 12
+    orientation: !dataclass:EulerOrientation
+      pitch: 0
+      roll: 90
+      yaw: 0
+    radius: 0.0725
+    start_angle: 0
+
+  - !dataclass:CircularPlacement
+    description: Layer 3, middle ring
+    height: 0.056
+    increment_angle: 90
+    model_label: id_37_costco_cucumber_sushi_roll_1_16g
+    num_items: 4
+    orientation: !dataclass:EulerOrientation
+      pitch: 0
+      roll: 90
+      yaw: 0
+    radius: 0.02
+    start_angle: 0
+
+  - !dataclass:CircularPlacement
+    description: Layer 3, outermost ring
+    height: 0.056
+    increment_angle: 36
+    model_label: id_37_costco_cucumber_sushi_roll_1_16g
+    num_items: 10
+    orientation: !dataclass:EulerOrientation
+      pitch: 0
+      roll: 90
+      yaw: 0
+    radius: 0.054
+    start_angle: 0
+
+  - !dataclass:CircularPlacement
+    description: Layer 4, innermost ring
+    height: 0.091
+    increment_angle: 36
+    model_label: id_52_costco_tuna_rice_ball_37g
+    num_items: 1
+    orientation: !dataclass:EulerOrientation
+      pitch: 0
+      roll: 90
+      yaw: 90
+    radius: 0
+    start_angle: 0

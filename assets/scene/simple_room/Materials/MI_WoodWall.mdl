@@ -1,0 +1,61 @@
+mdl 1.3;
+
+import math::*;
+import state::*;
+import tex::*;
+import anno::*;
+using OmniUe4Function import *;
+using OmniUe4Base import *;
+
+export annotation sampler_color();
+export annotation sampler_normal();
+export annotation sampler_grayscale();
+export annotation sampler_alpha();
+export annotation sampler_masks();
+export annotation sampler_distancefield();
+export annotation dither_masked_off();
+export annotation world_space_normal();
+
+export material MI_WoodWall(
+	float Texture_Tiling = 1.0,
+	uniform texture_2d Normal = texture_2d("./Textures/WallWood_Normal.png",::tex::gamma_linear)
+	[[sampler_normal()]],
+	float Albedo_Brightness = 0.87,
+	uniform texture_2d Albedo = texture_2d("./Textures/WallWood_Color.png",::tex::gamma_srgb)
+	[[sampler_color()]],
+	float Roughness = 1.1,
+	uniform texture_2d Roughness_tp = texture_2d("./Textures/WallWood_Rough.png",::tex::gamma_linear)
+	[[sampler_color()]])
+ = 
+	let {
+	float3 WorldPositionOffset_mdl = float3(0.0,0.0,0.0);
+	float2 CustomizedUV0_mdl = float2(state::texture_coordinate(0).x,1.0-state::texture_coordinate(0).y);
+
+	float2 Local0 = (CustomizedUV0_mdl * Texture_Tiling);
+	float4 Local1 = ::unpack_normal_map(tex::lookup_float4(Normal,float2(Local0.x,1.0-Local0.y),tex::wrap_repeat,tex::wrap_repeat));
+
+	float3 Normal_mdl = float3(Local1.x,Local1.y,Local1.z);
+
+	float4 Local2 = tex::lookup_float4(Albedo,float2(Local0.x,1.0-Local0.y),tex::wrap_repeat,tex::wrap_repeat);
+	float3 Local3 = (Albedo_Brightness * float3(Local2.x,Local2.y,Local2.z));
+	float4 Local4 = tex::lookup_float4(Roughness_tp,float2(Local0.x,1.0-Local0.y),tex::wrap_repeat,tex::wrap_repeat);
+	float3 Local5 = (Roughness * float3(Local4.x,Local4.y,Local4.z));
+
+	float3 EmissiveColor_mdl = float3(0.0,0.0,0.0);
+	float OpacityMask_mdl = 1.0;
+	float3 BaseColor_mdl = Local3;
+	float Metallic_mdl = 0.0;
+	float Specular_mdl = 0.5;
+	float Roughness_mdl = Local5.x;
+
+	} in
+		::OmniUe4Base(
+			base_color: BaseColor_mdl,
+			metallic: Metallic_mdl,
+			roughness: Roughness_mdl,
+			specular: Specular_mdl,
+			normal: Normal_mdl,
+			opacity: OpacityMask_mdl,
+			emissive_color: EmissiveColor_mdl,
+			displacement: WorldPositionOffset_mdl,
+			two_sided: false);

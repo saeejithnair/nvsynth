@@ -1,0 +1,93 @@
+#usda 1.0
+(
+    customLayerData = {
+        dictionary audioSettings = {
+            double dopplerLimit = 2
+            double dopplerScale = 1
+            double nonSpatialTimeScale = 1
+            double spatialTimeScale = 1
+            double speedOfSound = 340
+        }
+        dictionary cameraSettings = {
+            dictionary Front = {
+                double3 position = (1000.0000000000002, -2.220446049250313e-13, 0)
+                double radius = 500
+                double3 target = (0, 0, 0)
+            }
+            dictionary Perspective = {
+                double3 position = (48.853784864739325, 48.853734081581926, 48.85369831879513)
+                double radius = 84.61715700191493
+                double3 target = (0.00004649162292480469, -0.0000042915344522498344, -0.00004005432131748421)
+            }
+            dictionary Right = {
+                double3 position = (0, -1000, -2.220446049250313e-13)
+                double radius = 500
+                double3 target = (0, 0, 0)
+            }
+            dictionary Top = {
+                double3 position = (0, 0, 1000)
+                double radius = 500
+                double3 target = (0, 0, 0)
+            }
+            string boundCamera = "/OmniverseKit_Persp"
+        }
+        dictionary renderSettings = {
+            bool "rtx:hydra:materialSyncLoads" = 1
+            bool "rtx:materialDb:syncLoads" = 1
+            float "rtx:post:lensDistortion:cameraFocalLength" = 18.147562
+        }
+    }
+    defaultPrim = "_04_sugar_box"
+    metersPerUnit = 1
+    timeCodesPerSecond = 24
+    upAxis = "Z"
+)
+
+def "_04_sugar_box" (
+    prepend apiSchemas = ["PhysxRigidBodyAPI", "PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    prepend references = @../Axis_Aligned/004_sugar_box.usd@
+)
+{
+    vector3f physics:angularVelocity = (0, 0, 0)
+    point3f physics:centerOfMass = (0, 0, 0)
+    bool physics:kinematicEnabled = 0
+    float physics:mass = 0.514
+    bool physics:rigidBodyEnabled = 1
+    uniform bool physics:startsAsleep = 0
+    vector3f physics:velocity = (0, 0, 0)
+    float physxRigidBody:angularDamping = 0.05
+    bool physxRigidBody:enableCCD = 0
+    bool physxRigidBody:enableSpeculativeCCD = 0
+    float physxRigidBody:linearDamping = 0
+    int physxRigidBody:lockedPosAxis = 0
+    int physxRigidBody:lockedRotAxis = 0
+    float physxRigidBody:maxAngularVelocity = 100
+    float physxRigidBody:maxDepenetrationVelocity = inf
+    float physxRigidBody:maxLinearVelocity = inf
+    float physxRigidBody:sleepThreshold = 0.5
+    int physxRigidBody:solverPositionIterationCount = 4
+    int physxRigidBody:solverVelocityIterationCount = 1
+    float physxRigidBody:stabilizationThreshold = 0.0009999999
+    float3 xformOp:rotateZYX = (0, 0, 0)
+    float3 xformOp:scale = (1, 1, 1)
+    double3 xformOp:translate = (0, 0, 0)
+    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateZYX", "xformOp:scale"]
+
+    over "_04_sugar_box" (
+        prepend apiSchemas = ["PhysxCollisionAPI", "PhysicsMeshCollisionAPI", "PhysicsCollisionAPI", "PhysicsMassAPI", "PhysxConvexHullCollisionAPI"]
+    )
+    {
+        custom rel material:binding:physics = None
+        uniform token physics:approximation = "convexHull"
+        point3f physics:centerOfMass = (0, 0, 0)
+        bool physics:collisionEnabled = 1
+        float physxCollision:contactOffset = 0.02
+        float physxCollision:minTorsionalPatchRadius = 0
+        float physxCollision:restOffset = 0
+        float physxCollision:torsionalPatchRadius = 0
+        float physxConvexHullCollision:minThickness = 0.000010000001
+        float3 xformOp:scale = (0.01, 0.01, 0.01)
+        uniform token[] xformOpOrder = ["xformOp:scale"]
+    }
+}
+

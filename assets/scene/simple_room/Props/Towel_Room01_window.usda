@@ -1,0 +1,39 @@
+#usda 1.0
+(
+    defaultPrim = "Root"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "Root" (
+    kind = "component"
+)
+{
+    def Mesh "Towel_Room01_window"
+    {
+        float3[] extent = [(-342.21194, 354.41376, 46.57347), (342.212, 354.41382, 371.27576)]
+        int[] faceVertexCounts = [3, 3]
+        int[] faceVertexIndices = [0, 1, 2, 0, 2, 3]
+        rel material:binding = </Root/Looks/WorldGridMaterial>
+        normal3f[] normals = [(0, -1, 0), (0, -1, 0), (0, -1, 0), (0, -1, 0)] (
+            interpolation = "vertex"
+        )
+        point3f[] points = [(342.212, 354.41376, 371.27576), (-342.21194, 354.41376, 371.27576), (-342.21194, 354.41382, 46.57347), (342.212, 354.41382, 46.57347)]
+        texCoord2f[] primvars:st = [(1, 1), (0, 1), (0, 0), (1, 0)] (
+            interpolation = "vertex"
+        )
+        texCoord2f[] primvars:st1 = [(0.9921875, 0.9921875), (0.0078125, 0.9921875), (0.0078125, 0.0078125), (0.9921875, 0.0078125)] (
+            interpolation = "vertex"
+        )
+        texCoord2f[] primvars:vc = [(1, 1), (1, 1), (1, 1), (1, 1)] (
+            interpolation = "vertex"
+        )
+        texCoord2f[] primvars:vc1 = [(1, 1), (1, 1), (1, 1), (1, 1)] (
+            interpolation = "vertex"
+        )
+        uniform token subdivisionScheme = "none"
+        float3 xformOp:scale = (0.01, 0.01, 0.01)
+        uniform token[] xformOpOrder = ["xformOp:scale"]
+    }
+}
+

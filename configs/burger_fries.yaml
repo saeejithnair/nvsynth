@@ -1,0 +1,24 @@
+---
+scene:
+  num_steps: 200
+  camera:
+    position: [0, 200, 100]
+    horizontal_range:
+      max: 360
+      steps: 4
+    vertical_range:
+      max: 45
+      steps: 3
+  layer1:
+    name: "burger"
+    usd_path: "/pub2/nrc/aging/test/borger/poly_obj.usd"
+    scale: [20, 40]
+    num: 1
+    position: [[0, 0, 30], [5, 5, 0]]
+    rotation: [[0, 0, 0], [360, 360, 360]]
+    velocity: 0
+    angular_velocity: [[0, 0, 0], [100, 100, 100]]
+    static_friction: 0.9
+    dynamic_friction: 0.9
+    restitution: 0.05
+    mass: 100
