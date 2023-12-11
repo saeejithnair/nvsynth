@@ -3,8 +3,9 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="description" content="Generative Neural Architecture Search for Neural Radiance Fields.">
-  <meta name="keywords" content="Nerfies, D-NeRF, NeRF">
+  <meta name="description"
+    content="NutritionVerse-Synth: Synthetic Generation of Food Scenes for Dietary Intake Estimation.">
+  <meta name="keywords" content="nutrition-estimation, nutrition, synthetic, simulation, isaac-sim, nvsynth, nv-synth">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NutritionVerse-Synth: Synthetic Generation of Food Scenes for Dietary Intake Estimation</title>
 
@@ -72,50 +73,61 @@
     }
 
     .text {
-        text-align: center;
-        width: 80%;
-        margin: auto;
+      text-align: center;
+      width: 80%;
+      margin: auto;
     }
 
     .grid-container {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .grid-container-triple {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
     }
 
     .caption-container {
-        font-size: 2vw;
-        text-align: center;
+      font-size: 2vw;
+      text-align: center;
     }
 
     img {
-        max-width: 80%;
-        height: auto;
+      max-width: 80%;
+      height: auto;
     }
 
     .figure-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .overview-figure-container {
+      max-width: 100%;
     }
 
     .ground-truth-color {
-        color: black;
+      color: black;
     }
+
     .nerf-color {
-        color: gray;
+      color: gray;
     }
 
     .nas-nerf-s-color {
-        color: green;
+      color: green;
     }
 
     .nas-nerf-xs-color {
-        color: blue;
+      color: blue;
     }
 
     .nas-nerf-xxs-color {
-        color: red;
+      color: red;
     }
   </style>
 
@@ -194,7 +206,7 @@
         y = y - window.pageYOffset;
         return { x: x, y: y };
       }
-      
+
     }
   </script>
   <!-- Magnifier -->
@@ -203,22 +215,23 @@
 <body>
 
   <nav class="navbar" role="navigation" aria-label="main navigation">
-      <div class="navbar-brand">
-          <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
-              <span aria-hidden="true"></span>
-              <span aria-hidden="true"></span>
-              <span aria-hidden="true"></span>
-          </a>
+    <div class="navbar-brand">
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+    <div class="navbar-menu">
+      <div class="navbar-end">
+        <!-- Lab link with logo -->
+        <a class="navbar-item" href="https://vip.uwaterloo.ca/">
+          <img src="./static/viplogo.png" alt="Lab Logo" width="54" height="32" style="margin-right: 0.5em;">
+          <!-- Adjust the size as needed -->
+          Vision and Image Processing Lab
+        </a>
       </div>
-      <div class="navbar-menu">
-          <div class="navbar-end">
-              <!-- Lab link with logo -->
-              <a class="navbar-item" href="https://vip.uwaterloo.ca/">
-                  <img src="./static/viplogo.png" alt="Lab Logo" width="54" height="32" style="margin-right: 0.5em;"> <!-- Adjust the size as needed -->
-                  Vision and Image Processing Lab
-              </a>
-          </div>
-      </div>
+    </div>
   </nav>
 
 
@@ -227,18 +240,19 @@
       <div class="container is-max-desktop">
         <div class="columns is-centered">
           <div class="column has-text-centered">
-            <h1 class="title is-1 publication-title">NutritionVerse-Synth: Synthetic Generation of Food Scenes for Dietary Intake Estimation
+            <h1 class="title is-1 publication-title">NutritionVerse-Synth: Synthetic Generation of Food Scenes for
+              Dietary Intake Estimation
             </h1>
             <div class="is-size-5 publication-authors">
               <span class="author-block">
-                <a href="https://vip.uwaterloo.ca/">Saeejith Nair</a><sup>1</sup>,</span>
+                <a href="https://saeejithnair.github.io/">Saeejith Nair</a><sup>1</sup>,</span>
               <span class="author-block">
-                <a href="https://vip.uwaterloo.ca/">Amy Tai</a><sup>1</sup>,</span>
+                <a href="https://vip.uwaterloo.ca/c-tai/">Amy Tai</a><sup>1</sup>,</span>
               <span class="author-block">
-                <a href="https://vip.uwaterloo.ca/">Yuhao Chen</a><sup>1</sup>,
+                <a href="https://vip.uwaterloo.ca/yuhao-chen-2/">Yuhao Chen</a><sup>1</sup>,
               </span>
               <span class="author-block">
-                <a href="https://vip.uwaterloo.ca/">Alexander Wong</a><sup>1,2</sup>
+                <a href="https://vip.uwaterloo.ca/a-wong/">Alexander Wong</a><sup>1,2</sup>
               </span>
             </div>
 
@@ -251,7 +265,7 @@
               <div class="publication-links">
                 <!-- PDF Link. -->
                 <span class="link-block">
-                  <a href="https://youtu.be/dQw4w9WgXcQ" class="external-link button is-normal is-rounded is-dark">
+                  <a href="./static/nvsynth.pdf" class="external-link button is-normal is-rounded is-dark">
                     <span class="icon">
                       <i class="fas fa-file-pdf"></i>
                     </span>
@@ -259,7 +273,7 @@
                   </a>
                 </span>
                 <span class="link-block">
-                  <a href="https://youtu.be/dQw4w9WgXcQ" class="external-link button is-normal is-rounded is-dark">
+                  <a href="./static/nvsynth.pdf" class="external-link button is-normal is-rounded is-dark">
                     <span class="icon">
                       <i class="ai ai-arxiv"></i>
                     </span>
@@ -303,30 +317,90 @@
           <h2 class="title is-3">Abstract</h2>
           <div class="content has-text-justified">
             <p>
-              Manually tracking nutritional intake via food diaries is error-prone and burdensome.
-              Automated computer vision techniques show promise for dietary monitoring but require
-              large and diverse food image datasets. To address this need, we introduce NutritionVerse-Synth
-              (NV-Synth), a large-scale synthetic food image dataset. NV-Synth contains 84,984 photorealistic
-              meal images rendered from 7,082 procedurally generated 3D scenes. Each scene is captured from
-              12 viewpoints and includes perfect ground truth annotations such as RGB, depth, semantic,
-              instance, and amodal segmentation masks, bounding boxes, and detailed nutritional information
-              per food item. We demonstrate the diversity of NV-Synth across foods, compositions, viewpoints,
-              and lighting. As the largest open-source synthetic food dataset, NV-Synth highlights the value of
-              physics-based simulations for enabling scalable and controllable generation of diverse photorealistic
-              meal images to overcome data limitations and drive advancements in automated dietary assessment
-              using computer vision. 
-            </p><br></br>
+              Manually tracking nutritional intake via food diaries is error-prone and burdensome. Automated computer
+              vision techniques show promise for dietary monitoring but require large and diverse food image datasets.
+              To
+              address this need, we introduce NutritionVerse-Synth (NV-Synth), a large-scale synthetic food image
+              dataset. NV-Synth
+              contains 84,984 photorealistic meal images rendered from 7,082 dynamically plated 3D scenes. Each scene
+              is captured from
+              12 viewpoints and includes perfect ground truth annotations such as RGB, depth, semantic, instance, and
+              amodal
+              segmentation masks, bounding boxes, and detailed nutritional information per food item. We demonstrate the
+              diversity of
+              NV-Synth across foods, compositions, viewpoints, and lighting. As the largest open-source synthetic food
+              dataset, NV-Synth highlights the value of physics-based simulations for enabling scalable and controllable
+              generation of diverse photorealistic meal images to overcome data limitations and drive advancements in
+              automated dietary assessment using computer vision. In addition to the dataset, the <a
+                href="https://saeejithnair.github.io/nvsynth">source code</a> for our data generation framework is also
+              made publicly available.
+            </p>
+          </div>
+          <div class="figure-container">
+            <img src="./static/images/nvsynth_pipeline_dark.jpg" class="overview-figure-container"
+              alt="NV-Synth Pipeline Overview">
           </div>
         </div>
       </div>
       <!--/ Abstract. -->
     </div>
   </section>
-
   <section class="section">
-    <div class="figure-container">
-      <img src="./static/synthetic_meal_image_generation.jpg" alt="Synthetic Meal Image Generation">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3" align="left">NV-Synth Data Generation Framework</h2>
+        <div class="content has-text-justified">
+          <p>
+            Our data generation framework leverages the Isaac Sim physics engine from NVIDIA Omniverse for
+            GPU-accelerated simulation and uses high-resolution 3D food models from the NutritionVerse-3D dataset. To
+            allow both scalable domain-randomized data generation and flexibly customizing scene
+            compositions, we support two methods for generating synthetic meal images: dynamic plating and procedural
+            plating.
+          </p>
+        </div>
+        <div class="grid-container">
+          <div class="caption-container"><b>Dynamic Plating</b></div>
+          <div class="caption-container"><b>Procedural Plating</b></div>
+
+          <div class="image-container"><img src="static/gifs/combined.gif"></div>
+          <div class="image-container"><img src="static/gifs/procedural_combined.gif"></div>
+        </div>
+        <br></br>
+        <h2 class="title is-3" align="left">NV-Synth Dataset</h2>
+        <div class="content has-text-justified">
+          <p>
+            The NV-Synth dataset features randomly composed food scenes that are dynamically plated and captured from
+            multiple angles. Each scene has automatically generated perfect ground-truth annotations to enable
+            downstream training of models for nutrition prediction. Each scene also contains rich nutritional
+            annotations,
+            including mass, calories, carbohydrates, fats, and protein contents,
+            and food item labels indicating the ingredients present in each dish.
+          </p>
+        </div>
+        <div class="grid-container-triple">
+          <div class="caption-container is-4"><b>Multiple Viewpoints</b></div>
+          <div class="caption-container is-4"><b>Diverse Compositions</b></div>
+          <div class="caption-container is-4"><b>Multimodal Annotations</b></div>
+
+          <div class="image-container"><img src="static/images/camera_placements.jpg"></div>
+          <div class="image-container"><img src="static/images/randomized_compositions.jpg"></div>
+          <div class="image-container"><img src="static/images/dynamic_scene_with_annotations.jpg"></div>
+        </div>
+        <br></br>
+        <div class="grid-container">
+          <div class="caption-container is-4"><b>Class Distribution</b></div>
+          <div class="caption-container is-4"><b>Nutritional Information</b></div>
+
+          <div class="image-container"><img src="static/images/semantic_class_distribution.jpg"></div>
+          <div class="image-container"><img src="static/images/nutritional_distribution.jpg"></div>
+        </div>
+      </div>
     </div>
+    <br></br>
+    <div class="figure-container">
+      <img src="./static/images/synthetic_meal_image_generation.jpg" alt="Synthetic Meal Image Generation">
+    </div>
+
   </section>
 
   <!-- <section class="section" id="BibTeX">
@@ -355,8 +429,8 @@
         <div class="column is-8">
           <div class="content">
             <p>
-              This website is built based on <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>,
-              <a href="https://github.com/AIBluefisher/dbarf">DBARF</a>, and uses the magnifier from <a href="https://www.idiap.ch/paper/eslam/">ESLAM</a>.
+              This website is built based on <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>
+              and <a href="https://github.com/AIBluefisher/dbarf">DBARF</a>.
             </p>
           </div>
         </div>
@@ -364,9 +438,9 @@
     </div>
   </footer>
 
-<script src="./static/js/magnifier.js"></script>
-<!-- <script> imageZoom("reference", ["zoomed-imap", "zoomed-nice", "zoomed-eslam" ], 7); </script> -->
-<script> imageZoom("reference_mesh", ["zoomed-nerf_rgb", "zoomed-nas-nerf-s_rgb", "zoomed-nas-nerf-xs_rgb", "zoomed-nas-nerf-xxs_rgb" ], 8); </script>
+  <script src="./static/js/magnifier.js"></script>
+  <!-- <script> imageZoom("reference", ["zoomed-imap", "zoomed-nice", "zoomed-eslam" ], 7); </script> -->
+  <script> imageZoom("reference_mesh", ["zoomed-nerf_rgb", "zoomed-nas-nerf-s_rgb", "zoomed-nas-nerf-xs_rgb", "zoomed-nas-nerf-xxs_rgb"], 8); </script>
 
 </body>
 
