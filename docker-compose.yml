@@ -1,0 +1,38 @@
+services:
+  nvsynth:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.2023.1.1
+    image: vip/nvsynth
+    runtime: nvidia
+    volumes:
+      - .:/nvsynth
+      # food data volume
+      - /pub2/nrc/aging/snair_iccv_data:/food
+      # isaac-sim related volumes
+      - ~/docker/isaac-sim/cache/kit:/isaac-sim/kit/cache/kit
+      - ~/docker/isaac-sim/cache/ov:/root/.cache/ov
+      - ~/docker/isaac-sim/cache/pip:/root/.cache/pip
+      - ~/docker/isaac-sim/cache/glcache:/root/.cache/nvidia/GLCache
+      - ~/docker/isaac-sim/cache/computecache:/root/.nv/ComputeCache
+      - ~/docker/isaac-sim/logs:/root/.nvidia-omniverse/logs
+      - ~/docker/isaac-sim/data:/root/.local/share/ov/data
+      - ~/docker/isaac-sim/documents:/root/Documents
+    ports:
+      - 8211:8211
+      - 8011:8011
+
+      - 48010:48010 # native
+      - 8899:8899 # websocket (h264)
+      - 49100:49100 # webrtc
+    environment:
+      - ACCEPT_EULA=Y
+      - PRIVACY_CONSENT=Y
+    # network_mode: "host"
+    ipc: host
+    tty: True
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
