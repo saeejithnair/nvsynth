@@ -36,3 +36,5 @@ tail -f /root/.nvidia-omniverse/logs/Kit/Isaac-Sim/2023.1/kit_YYYYMMDD_HHMMSS.lo
 main: thread_init: already added for thread
 main: thread_init: already added for thread
 ```
+
+- ignore everything above, all it took was adding `network: "host"` to the docker-compose

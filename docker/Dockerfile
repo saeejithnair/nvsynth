@@ -13,10 +13,13 @@ RUN apt-get update && \
 
 COPY . /nvsynth
 
+SHELL [ "/bin/bash", "-c" ]
+
 # configure omni-provided python
-RUN echo "export PATH=$PATH:/isaac-sim/kit/python/bin\n" >> /root/.bashrc && \
-    echo "source /nvsynth/docker/setup_docker_env.sh\n" >> /root/.bashrc && \
+RUN echo "export PATH=$PATH:/isaac-sim/kit/python/bin" >> /root/.bashrc && \
+    echo "source /nvsynth/docker/setup_docker_env.sh" >> /root/.bashrc && \
     ln -s /isaac-sim/kit/python/bin/python3 /isaac-sim/kit/python/bin/python && \
+    source /isaac-sim/setup_python_env.sh && \
     /isaac-sim/kit/python/bin/python -m pip install --upgrade pip && \
     /isaac-sim/kit/python/bin/pip install -r /nvsynth/docker/requirements.docker.txt
 
