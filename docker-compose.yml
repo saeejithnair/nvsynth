@@ -1,7 +1,18 @@
 services:
   isaac-sim:
-    image: nvcr.io/nvidia/isaac-sim:2023.1.1
+    image: vip/nvsynth
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: isaac-sim
+    command: ["--/app/livestream/logLevel=debug"]
+    #   target: nvsynth
+    # command: ["python scripts/gen_random_scenes.py"]
     volumes:
+      - .:/nvsynth
+      # food data volume
+      - /pub2/nrc/aging/snair_iccv_data:/food
+      # isaac-sim related volumes
       - ~/docker/isaac-sim/cache/kit:/isaac-sim/kit/cache/kit
       - ~/docker/isaac-sim/cache/ov:/root/.cache/ov
       - ~/docker/isaac-sim/cache/pip:/root/.cache/pip

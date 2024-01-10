@@ -1,4 +1,14 @@
-FROM nvcr.io/nvidia/isaac-sim:2023.1.1 AS base
+FROM nvcr.io/nvidia/isaac-sim:2023.1.1 AS isaac-sim
+
+# personal dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    wget lsof git neovim
+
+# override entrypoint as list to enable command args in docker-compose.yml
+ENTRYPOINT ["/isaac-sim/runheadless.native.sh"]
+
+FROM isaac-sim AS nvsynth
 
 # install dependencies
 RUN apt-get update && \
@@ -6,23 +16,19 @@ RUN apt-get update && \
     libcurl4-openssl-dev build-essential && \
     apt-get clean
 
-# personal dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    wget lsof git neovim
-
 COPY . /nvsynth
+
+WORKDIR /nvsynth
 
 SHELL [ "/bin/bash", "-c" ]
 
 # configure omni-provided python
-RUN echo "export PATH=$PATH:/isaac-sim/kit/python/bin" >> /root/.bashrc && \
-    echo "source /nvsynth/docker/setup_docker_env.sh" >> /root/.bashrc && \
+RUN echo "source /nvsynth/docker/setup_docker_env.sh" >> /root/.bashrc && \
     ln -s /isaac-sim/kit/python/bin/python3 /isaac-sim/kit/python/bin/python && \
-    source /isaac-sim/setup_python_env.sh && \
-    /isaac-sim/kit/python/bin/python -m pip install --upgrade pip && \
-    /isaac-sim/kit/python/bin/pip install -r /nvsynth/docker/requirements.docker.txt
+    source /nvsynth/docker/setup_docker_env.sh && \
+    python -m pip install --upgrade pip && \
+    pip install -r /nvsynth/docker/requirements.docker.txt
 
-# overrides entrypoint from base image
-WORKDIR /nvsynth
-ENTRYPOINT bash
+# set entrypoint to run a command, with the default being bash
+ENTRYPOINT ["/bin/bash", "-i", "-c"]
+CMD ["/bin/bash"]
