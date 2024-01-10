@@ -20,7 +20,7 @@ COPY . /nvsynth
 
 WORKDIR /nvsynth
 
-SHELL [ "/bin/bash", "-c" ]
+SHELL ["/bin/bash", "-c"]
 
 # configure omni-provided python
 RUN echo "source /nvsynth/docker/setup_docker_env.sh" >> /root/.bashrc && \

@@ -5,9 +5,6 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       target: isaac-sim
-    command: ["--/app/livestream/logLevel=debug"]
-    #   target: nvsynth
-    # command: ["python scripts/gen_random_scenes.py"]
     volumes:
       - .:/nvsynth
       # food data volume
