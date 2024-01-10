@@ -1,34 +1,114 @@
-FROM nvcr.io/nvidia/isaac-sim:2023.1.1 AS isaac-sim
+## -----------------------------------------
+## Stage 1: Base dependencies installation.
+## -----------------------------------------
 
-# personal dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    wget lsof git neovim
+FROM nvcr.io/nvidia/isaac-sim:2023.1.1 AS base
 
-# override entrypoint as list to enable command args in docker-compose.yml
-ENTRYPOINT ["/isaac-sim/runheadless.native.sh"]
+# Project name.
+ENV PROJECT="nvsynth"
 
-FROM isaac-sim AS nvsynth
+# Update system packages and install the basic ones
+RUN apt-get -y update && \
+    apt-get -y install --no-install-recommends \
+    apt-utils \
+    software-properties-common \
+    build-essential \
+    sudo
 
-# install dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    libcurl4-openssl-dev build-essential && \
-    apt-get clean
+## -----------------------------------------
+## Stage 2: User setup.
+## -----------------------------------------
+FROM base AS setup
 
-COPY . /nvsynth
+# User and group ids to map the docker user to the host user.
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+# Group ID to add the docker user to a shared group the host user is part of.
+ARG SHARED_GROUP_ID
 
-WORKDIR /nvsynth
+ARG DOCKER_USERNAME="user"
+ARG HOST_USERNAME="null"
+ARG HOSTNAME
+ENV USER_NAME $DOCKER_USERNAME
+ENV HOST_USERNAME $HOST_USERNAME
+ENV HOSTNAME $HOSTNAME
+ENV USER_HOME="/home/${USER_NAME}"
 
+# Add a non-root docker user with passwordless sudo permissions and map this
+# docker user to the host user so that created files in the docker container
+# are owned by the host user.
+RUN addgroup --gid $GROUP_ID $USER_NAME && \
+    adduser \
+    --uid $USER_ID \
+    --ingroup $USER_NAME \
+    --home $USER_HOME \
+    --shell /bin/bash \
+    --disabled-password \
+    --gecos "" \
+    $USER_NAME && \
+    echo "${USER_NAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/nopasswd
+
+# Create shared group with same GID as a shared host group (e.g. vip_user) and
+# add docker user to this secondary group so that they can access any shared
+# dirs that might need to be mounted.
+ENV SHARED_GROUP_NAME="host_shared"
+RUN if [ ! -z $SHARED_GROUP_ID ]; then \
+    groupadd -g $SHARED_GROUP_ID $SHARED_GROUP_NAME && \
+    usermod -a -G $SHARED_GROUP_NAME $USER_NAME; \
+    fi
+
+# TODO(saeejithnair): test if this works
+RUN usermod -aG sudo $USER_NAME
+
+# TODO(saeejithnair): figure out what to do about this mess...
+# RUN chown $USER_NAME:$USER_NAME -R /isaac-sim
+
+# Copy apt dependencies file
+COPY ./docker/deps/apt_requirements.txt /docker/deps/apt_requirements.txt
+
+# Install additional dependencies from requirements file
+RUN xargs -d '\n' -a /docker/deps/apt_requirements.txt \
+    apt-get -y install \
+    --no-install-recommends
+
+# Clean up to reduce image size
+RUN rm -rf /var/lib/apt/lists/*
+
+USER $USER_NAME
+WORKDIR $USER_HOME
+
+# Add local user binary folder to PATH variable.
+ENV PATH="${PATH}:${USER_HOME}/.local/bin"
+
+# Set default shell to bash.
 SHELL ["/bin/bash", "-c"]
 
-# configure omni-provided python
-RUN echo "source /nvsynth/docker/setup_docker_env.sh" >> /root/.bashrc && \
-    ln -s /isaac-sim/kit/python/bin/python3 /isaac-sim/kit/python/bin/python && \
-    source /nvsynth/docker/setup_docker_env.sh && \
-    python -m pip install --upgrade pip && \
-    pip install -r /nvsynth/docker/requirements.docker.txt
+## -----------------------------------------
+## Stage 3: Application building.
+## -----------------------------------------
+FROM setup AS app
 
-# set entrypoint to run a command, with the default being bash
-ENTRYPOINT ["/bin/bash", "-i", "-c"]
-CMD ["/bin/bash"]
+# Copy dependency files
+COPY ./docker/deps/pip_requirements.txt /docker/deps/pip_requirements.txt
+COPY ./docker/deps/entrypoint.sh /home/user/entrypoint.sh
+COPY ./docker/deps/setup_docker_env.sh /home/user/setup_docker_env.sh
+
+USER root
+RUN chmod +x /home/user/entrypoint.sh && \
+    chown $USER_NAME:$USER_NAME /home/user/entrypoint.sh && \
+    chmod +x /home/user/setup_docker_env.sh && \
+    chown $USER_NAME:$USER_NAME /home/user/setup_docker_env.sh && \
+    chown $USER_NAME:$USER_NAME /home/user/setup_docker_env.sh
+
+# configure omni-provided python
+RUN echo "source /home/user/setup_docker_env.sh" >> /root/.bashrc && \
+    ln -s /isaac-sim/kit/python/bin/python3 /isaac-sim/kit/python/bin/python && \
+    source /home/user/setup_docker_env.sh && \
+    python -m pip install --upgrade pip && \
+    pip install -r /docker/deps/pip_requirements.txt
+
+COPY . /nvsynth
+WORKDIR /nvsynth
+
+USER $USER_NAME
+ENTRYPOINT ["/bin/bash", "/home/user/entrypoint.sh"]

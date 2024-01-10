@@ -1,10 +1,17 @@
 services:
   isaac-sim:
-    image: vip/nvsynth
     build:
       context: .
       dockerfile: docker/Dockerfile
-      target: isaac-sim
+      args:
+        CUDA_ARCHITECTURES: ${CUDA_ARCHITECTURES:-86}
+        USER_ID: ${USER_ID:?}
+        GROUP_ID: ${GROUP_ID:?}
+        SHARED_GROUP_ID: ${SHARED_GROUP_ID}
+        DOCKER_USERNAME: ${DOCKER_USERNAME:?}
+    command: []
+    image: ${USERNAME:?}/nvsynth
+    user: ${USER_ID:?}:${GROUP_ID:?}
     volumes:
       - .:/nvsynth
       # food data volume
