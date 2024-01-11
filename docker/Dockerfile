@@ -1,7 +1,6 @@
 ## -----------------------------------------
 ## Stage 1: Base dependencies installation.
 ## -----------------------------------------
-
 FROM nvcr.io/nvidia/isaac-sim:2023.1.1 AS base
 
 # Project name.
@@ -14,6 +13,17 @@ RUN apt-get -y update && \
     software-properties-common \
     build-essential \
     sudo
+
+# Copy apt dependencies file
+COPY ./docker/deps/apt_requirements.txt /docker/deps/apt_requirements.txt
+
+# Install additional dependencies from requirements file
+RUN xargs -d '\n' -a /docker/deps/apt_requirements.txt \
+    apt-get -y install \
+    --no-install-recommends
+
+# Clean up to reduce image size
+RUN rm -rf /var/lib/apt/lists/*
 
 ## -----------------------------------------
 ## Stage 2: User setup.
@@ -57,22 +67,8 @@ RUN if [ ! -z $SHARED_GROUP_ID ]; then \
     usermod -a -G $SHARED_GROUP_NAME $USER_NAME; \
     fi
 
-# TODO(saeejithnair): test if this works
-RUN usermod -aG sudo $USER_NAME
-
-# TODO(saeejithnair): figure out what to do about this mess...
-# RUN chown $USER_NAME:$USER_NAME -R /isaac-sim
-
-# Copy apt dependencies file
-COPY ./docker/deps/apt_requirements.txt /docker/deps/apt_requirements.txt
-
-# Install additional dependencies from requirements file
-RUN xargs -d '\n' -a /docker/deps/apt_requirements.txt \
-    apt-get -y install \
-    --no-install-recommends
-
-# Clean up to reduce image size
-RUN rm -rf /var/lib/apt/lists/*
+# kinda hacky but MUCH FASTER than recursive chown. see https://github.com/docker/for-linux/issues/388
+COPY --from=base --chown=${USER_ID}:${GROUP_ID} /isaac-sim /isaac-sim
 
 USER $USER_NAME
 WORKDIR $USER_HOME
