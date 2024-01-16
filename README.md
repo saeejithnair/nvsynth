@@ -3,21 +3,17 @@ NutritionVerse-Synth: Synthetic generation of food scenes for dietary intake est
 
 ## Set Up for Docker (Streaming)
 
-### Pre-Requisites
+### On Remote Machine (Streaming Server)
 
-- Remote Machine:
-    - Docker Installation (check with: `docker run hello-world`)
-    - [NVIDIA Container Toolkit](https://github.com/NVIDIA/nvidia-docker). (check: `nvidia-container-cli -V`)
-    - A [NGC Account](https://docs.nvidia.com/ngc/ngc-overview/index.html#registering-activating-ngc-account) and an [NGC API Key](https://docs.nvidia.com/ngc/ngc-overview/index.html#generating-api-key)
-        - See this [this page](https://docs.nvidia.com/launchpad/ai/base-command-coe/latest/bc-coe-docker-basics-step-02.html)
-        - Make an account and configure/verify your docker credentials locally with: (`docker login nvcr.io`)
+#### Pre-Requisites
 
-- Local machine:
-    - [Omniverse Installation](https://www.nvidia.com/en-us/omniverse/download/)
-    - Streaming Client [installed via Omni Exchange](https://docs.omniverse.nvidia.com/streaming-client/latest/user-manual.html#installation-and-usage)
+- Docker Installation (check with: `docker run hello-world`)
+- [NVIDIA Container Toolkit](https://github.com/NVIDIA/nvidia-docker). (check: `nvidia-container-cli -V`)
+- A [NGC Account](https://docs.nvidia.com/ngc/ngc-overview/index.html#registering-activating-ngc-account) and an [NGC API Key](https://docs.nvidia.com/ngc/ngc-overview/index.html#generating-api-key)
+    - See this [this page](https://docs.nvidia.com/launchpad/ai/base-command-coe/latest/bc-coe-docker-basics-step-02.html)
+    - Make an account and configure/verify your docker credentials locally with: (`docker login nvcr.io`)
 
-
-### Set Up on Remote Machine
+#### Set Up
 
 - Clone this repository:
 ```bash
@@ -25,50 +21,95 @@ git clone git@github.com:saeejithnair/nvsynth.git
 cd nvsynth
 ```
 
-- Start the Isaac Sim docker container:
+- Setup your environment variables:
+```bash
+./initialize.sh
+```
+
+- Build the Isaac Sim docker container:
+```bash
+docker compose build
+```
+
+### On Your Local Machine (Streaming Client)
+
+  - Install [Omniverse](https://www.nvidia.com/en-us/omniverse/download/)
+  - Install the [Streaming Client via Omni Exchange](https://docs.omniverse.nvidia.com/streaming-client/latest/user-manual.html#installation-and-usage)
+
+## Usage for Docker (Streaming)
+
+### On Remote Machine (Streaming Server)
+
+- There are currently two usages of this docker container:
+  - (1) the first is simply running the base `isaac-sim` app
+  - (2) the second is running our custom python scripts in this repo
+  - (3) the third (default) is starting the docker container and running scripts/the app manually
+
+
+#### (1) Running the Base Isaac Sim App
+
+- For the basic usage of the app, supply the following command to the service in the `docker-compose.yml`
+```yaml
+services:
+  isaac-sim:
+    command: ["/isaac-sim/runheadless.native.sh"]
+```
+
+- You can also add arguments by appending them to the list:
+```yaml
+services:
+  isaac-sim:
+    command: ["/isaac-sim/runheadless.native.sh", "--/app/livestream/logLevel=debug", "--/app/window/dpiScaleOverride=1.5"]
+```
+
+- Then we can start our docker container with
 ```bash
 docker compose up
 ```
 
-- Now that your the Omniverse streamer is running we can move onto viewing the stream on our local machine
+#### (2) Running Isaac Sim via a Python Script
 
-### Setup on Your Local Machine
+- To run our scripts, we also modify the `docker-compose.yml` file by changing the target of our `Dockerfile` to `nvsynth` and add the command `"python path/to/script.py"`:
+```yaml
+services:
+  isaac-sim:
+    command: ["python", "scripts/gen_random_scenes.py"] # path of script is relative to repo root
+```
+
+- Then we can start our docker container with
+```bash
+docker compose up
+```
+
+#### (3) Running Isaac Sim Manually
+
+- Start the docker container:
+```bash
+docker compose up -d
+```
+
+- Enter the container
+```bash
+docker compose exec isaac-sim bash
+```
+
+- Run the a command to start the Isaac-Sim app
+```bash
+/isaac-sim/runheadless.native.sh
+# OR
+python scripts/gen_random_scenes.py
+```
+
+### On Your Local Machine (Streaming Client)
+
+- Now that your the Omniverse Streamer is running on the remote machine, we can view the stream on our local machine
 
 - Open a local terminal and forward the stream URL on the remote machine locally:
 ```bash
 ssh -NL 48010:localhost:48010 <ip of remote machine>
 ```
 
-- Launch the Omniverse Streaming Client [and connect](https://docs.omniverse.nvidia.com/streaming-client/latest/user-manual.html#installation-and-usage)
-
-### Advanced Usage
-
-- There are currently two usages of this docker workflow:
-    - the first and default is the basic usage of the app
-    - the second is running our custom python scripts in this repo
-
-- For the basic usage of the app, we can add arguments or parameters by adding commands to the `docker-compose.yml` file:
-```yaml
-  isaac-sim:
-    image: vip/nvsynth
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-      target: isaac-sim
-    command: ["--/app/livestream/logLevel=debug", "--/app/window/dpiScaleOverride=1.5"]
-```
-
-- To run our scripts, we also modify the `docker-compose.yml` file by changing the target of our `Dockerfile` to `nvsynth` and add the command `"python path/to/script.py"`:
-```yaml
-  isaac-sim:
-    image: vip/nvsynth
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-      target: nvsynth # <- change target
-    command: ["python scripts/gen_random_scenes.py"] # path is relative to repo root
-```
-- Then we can start our docker compose, remember whenever we change the `target` or `Dockerfile`, we must rebuild (i.e. `docker compose build` or `docker compose up --build`)
+- Launch the Omniverse Streaming Client by [pressing connect](https://docs.omniverse.nvidia.com/streaming-client/latest/user-manual.html#installation-and-usage)
 
 ### Debugging
 
