@@ -4,12 +4,10 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        CUDA_ARCHITECTURES: ${CUDA_ARCHITECTURES:-86}
         USER_ID: ${USER_ID:?}
         GROUP_ID: ${GROUP_ID:?}
         SHARED_GROUP_ID: ${SHARED_GROUP_ID}
         DOCKER_USERNAME: ${DOCKER_USERNAME:?}
-    command: []
     image: ${USERNAME:?}/nvsynth
     user: ${USER_ID:?}:${GROUP_ID:?}
     volumes:
@@ -18,13 +16,13 @@ services:
       - /pub2/nrc/aging/snair_iccv_data:/food
       # isaac-sim related volumes
       - ~/docker/isaac-sim/cache/kit:/isaac-sim/kit/cache/kit
-      - ~/docker/isaac-sim/cache/ov:/root/.cache/ov
-      - ~/docker/isaac-sim/cache/pip:/root/.cache/pip
-      - ~/docker/isaac-sim/cache/glcache:/root/.cache/nvidia/GLCache
-      - ~/docker/isaac-sim/cache/computecache:/root/.nv/ComputeCache
-      - ~/docker/isaac-sim/logs:/root/.nvidia-omniverse/logs
-      - ~/docker/isaac-sim/data:/root/.local/share/ov/data
-      - ~/docker/isaac-sim/documents:/root/Documents
+      - ~/docker/isaac-sim/cache/ov:/user/.cache/ov
+      - ~/docker/isaac-sim/cache/pip:/user/.cache/pip
+      - ~/docker/isaac-sim/cache/glcache:/user/.cache/nvidia/GLCache
+      - ~/docker/isaac-sim/cache/computecache:/user/.nv/ComputeCache
+      - ~/docker/isaac-sim/logs:/user/.nvidia-omniverse/logs
+      - ~/docker/isaac-sim/data:/user/.local/share/ov/data
+      - ~/docker/isaac-sim/documents:/user/Documents
     environment:
       - ACCEPT_EULA=Y
       - PRIVACY_CONSENT=Y

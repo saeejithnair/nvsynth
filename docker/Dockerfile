@@ -73,7 +73,7 @@ COPY --from=base --chown=${USER_ID}:${GROUP_ID} /isaac-sim /isaac-sim
 USER $USER_NAME
 WORKDIR $USER_HOME
 
-# Add local user binary folder to PATH variable.
+# Add local user binary folder to PATH variable
 ENV PATH="${PATH}:${USER_HOME}/.local/bin"
 
 # Set default shell to bash.
@@ -97,7 +97,7 @@ RUN chmod +x /home/user/entrypoint.sh && \
     chown $USER_NAME:$USER_NAME /home/user/setup_docker_env.sh
 
 # configure omni-provided python
-RUN echo "source /home/user/setup_docker_env.sh" >> /root/.bashrc && \
+RUN sed -i '1s/^/source \/home\/user\/setup_docker_env.sh\n/' /home/user/.bashrc && \
     ln -s /isaac-sim/kit/python/bin/python3 /isaac-sim/kit/python/bin/python && \
     source /home/user/setup_docker_env.sh && \
     python -m pip install --upgrade pip && \
@@ -107,4 +107,4 @@ COPY . /nvsynth
 WORKDIR /nvsynth
 
 USER $USER_NAME
-ENTRYPOINT ["/bin/bash", "/home/user/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "-i", "/home/user/entrypoint.sh"]
