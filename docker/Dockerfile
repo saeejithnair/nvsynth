@@ -1,34 +1,52 @@
-FROM nvcr.io/nvidia/isaac-sim:2023.1.1 AS isaac-sim
+## -----------------------------------------
+## Stage 1: Base dependencies installation.
+## -----------------------------------------
+FROM nvcr.io/nvidia/isaac-sim:2023.1.1 AS base
 
-# personal dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    wget lsof git neovim
+# Project name.
+ENV PROJECT="nvsynth"
 
-# override entrypoint as list to enable command args in docker-compose.yml
-ENTRYPOINT ["/isaac-sim/runheadless.native.sh"]
+# Update system packages and install the basic ones
+RUN apt-get -y update && \
+    apt-get -y install --no-install-recommends \
+    apt-utils \
+    software-properties-common \
+    build-essential \
+    sudo
 
-FROM isaac-sim AS nvsynth
+# Copy apt dependencies file
+COPY ./docker/deps/apt_requirements.txt /docker/deps/apt_requirements.txt
 
-# install dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    libcurl4-openssl-dev build-essential && \
-    apt-get clean
+# Install additional dependencies from requirements file
+RUN xargs -d '\n' -a /docker/deps/apt_requirements.txt \
+    apt-get -y install \
+    --no-install-recommends
 
-COPY . /nvsynth
+# Clean up to reduce image size
+RUN rm -rf /var/lib/apt/lists/*
 
-WORKDIR /nvsynth
+## -----------------------------------------
+## Stage 2: Application building.
+## -----------------------------------------
+FROM base AS app
 
+# Copy dependency files
+COPY ./docker/deps/pip_requirements.txt /docker/deps/pip_requirements.txt
+COPY ./docker/deps/entrypoint.sh /root/entrypoint.sh
+COPY ./docker/deps/setup_docker_env.sh /root/setup_docker_env.sh
+
+# Set default shell to bash.
 SHELL ["/bin/bash", "-c"]
 
 # configure omni-provided python
-RUN echo "source /nvsynth/docker/setup_docker_env.sh" >> /root/.bashrc && \
+RUN sed -i '1s/^/source \/root\/setup_docker_env.sh\n/' /root/.bashrc && \
     ln -s /isaac-sim/kit/python/bin/python3 /isaac-sim/kit/python/bin/python && \
-    source /nvsynth/docker/setup_docker_env.sh && \
-    python -m pip install --upgrade pip && \
-    pip install -r /nvsynth/docker/requirements.docker.txt
+    source /root/setup_docker_env.sh && \
+    python -m pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r /docker/deps/pip_requirements.txt
 
-# set entrypoint to run a command, with the default being bash
-ENTRYPOINT ["/bin/bash", "-i", "-c"]
-CMD ["/bin/bash"]
+COPY . /nvsynth
+WORKDIR /nvsynth
+
+USER $USER_NAME
+ENTRYPOINT ["/bin/bash", "-i", "/root/entrypoint.sh"]
