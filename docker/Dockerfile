@@ -3,16 +3,12 @@
 ## -----------------------------------------
 FROM nvcr.io/nvidia/isaac-sim:2023.1.1 AS base
 
-# Project name.
-ENV PROJECT="nvsynth"
-
 # Update system packages and install the basic ones
 RUN apt-get -y update && \
     apt-get -y install --no-install-recommends \
     apt-utils \
     software-properties-common \
     build-essential \
-    sudo
 
 # Copy apt dependencies file
 COPY ./docker/deps/apt_requirements.txt /docker/deps/apt_requirements.txt
@@ -48,5 +44,4 @@ RUN sed -i '1s/^/source \/root\/setup_docker_env.sh\n/' /root/.bashrc && \
 COPY . /nvsynth
 WORKDIR /nvsynth
 
-USER $USER_NAME
 ENTRYPOINT ["/bin/bash", "-i", "/root/entrypoint.sh"]
