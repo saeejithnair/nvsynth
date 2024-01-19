@@ -137,9 +137,14 @@ wget localhost:49100 # 501 Not Implemented
 
 - You can also monitor the logs in the container with:
 ```bash
-docker compose exec isaac-sim bash
 # filename is in format `kit_YYYYMMDD_HHMMSS.log` use tab to complete
-tail -f /root/.nvidia-omniverse/logs/Kit/Isaac-Sim/2023.1/kit_
+tail -f ~/docker/isaac-sim/logs/Kit/Isaac-Sim/2023.1/kit_
+```
+
+- If you get any permission errors when running isaac-sim, check if there are files/folders not owned by you with:
+```bash
+find ~/docker/isaac-sim/ ! -user $(whoami) -print
+# If files are printed out, try running: chown -R $(id -u):$(id -g) ~/docker
 ```
 
 ## Set Up for Lavazza

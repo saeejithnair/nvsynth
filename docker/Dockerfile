@@ -79,9 +79,6 @@ COPY --from=base --chown=${USER_ID}:${GROUP_ID} /isaac-sim /isaac-sim
 USER $USER_NAME
 WORKDIR $USER_HOME
 
-# fixes bug where cache folder is created and owned by root
-RUN mkdir /isaac-sim/kit/cache/
-
 # Add local user binary folder to PATH variable
 ENV PATH="${PATH}:${USER_HOME}/.local/bin"
 
