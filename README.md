@@ -33,8 +33,7 @@ docker compose build
 
 ### On Your Local Machine (Streaming Client)
 
-  - Install [Omniverse](https://www.nvidia.com/en-us/omniverse/download/)
-  - Install the [Streaming Client via Omni Exchange](https://docs.omniverse.nvidia.com/streaming-client/latest/user-manual.html#installation-and-usage)
+  - A chromium-based browser (Google Chrome, Chromium, Microsoft Edge)
 
 ## Usage for Docker (Streaming)
 
@@ -52,14 +51,20 @@ docker compose build
 ```yaml
 services:
   isaac-sim:
-    command: ["/isaac-sim/runheadless.native.sh"]
+    command: ["/isaac-sim/runheadless.webrtc.sh"]
 ```
 
 - You can also add arguments by appending them to the list:
 ```yaml
 services:
   isaac-sim:
-    command: ["/isaac-sim/runheadless.native.sh", "--/app/livestream/logLevel=debug", "--/app/window/dpiScaleOverride=1.5"]
+    command: [
+      "/isaac-sim/runheadless.webrtc.sh",
+      "--/app/livestream/logLevel=debug", # set livestream loglevels
+      "--/app/window/dpiScaleOverride=1.5", # rescale livestream window UI
+      "--/exts/omni.services.transport.server.http/port=8045", # change WebRTC server port
+      "--/app/livestream/port=48010", # change livestream data port
+    ]
 ```
 
 - Then we can start our docker container with
@@ -95,7 +100,7 @@ docker compose exec isaac-sim bash
 
 - Run the a command to start the Isaac-Sim app
 ```bash
-/isaac-sim/runheadless.native.sh
+/isaac-sim/runheadless.webrtc.sh
 # OR
 python scripts/gen_random_scenes.py
 ```
@@ -104,25 +109,30 @@ python scripts/gen_random_scenes.py
 
 - Now that your the Omniverse Streamer is running on the remote machine, we can view the stream on our local machine
 
-- Open a local terminal and forward the stream URL on the remote machine locally:
+- Open a local terminal and forward the stream URLs on the remote machine to your machine:
 ```bash
-ssh -NL 48010:localhost:48010 <ip of remote machine>
+ssh -NL 8211:localhost:8211 -L 49100:localhost:49100 <ip of remote machine>
 ```
 
-- Launch the Omniverse Streaming Client by [pressing connect](https://docs.omniverse.nvidia.com/streaming-client/latest/user-manual.html#installation-and-usage)
+- Go to a browser and open: http://127.0.0.1:8211/streaming/webrtc-demo/?server=127.0.0.1
+  - it may have to be chromium-based, firefox did not work for me
 
 ### Debugging
 
 - On the remote machine you can check that the correct ports are being used with: 
 ```bash
 docker compose exec isaac-sim bash -c "lsof -nP -iTCP -sTCP:LISTEN"
-```
-
-- You should see an output similar to this:
-```
+# You should see an output similar to this:
 COMMAND PID USER   FD   TYPE   DEVICE SIZE/OFF NODE NAME
 kit      21 root  258u  IPv4 43127461      0t0  TCP *:48010 (LISTEN)
 kit      21 root  277u  IPv4 43151425      0t0  TCP *:8211 (LISTEN)
+```
+
+- On your client machine try and ping the ports, that you have forwarded on your machine
+  - you should get `404 Not Found` or `501 Not Implemented` errors, but you should not be getting `failed: Connection refused.`
+```bash
+wget localhost:8211 # 404 Not Found
+wget localhost:49100 # 501 Not Implemented
 ```
 
 - You can also monitor the logs in the container with:
