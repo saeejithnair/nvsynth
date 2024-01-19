@@ -13,16 +13,18 @@ services:
     volumes:
       - .:/nvsynth
       # food data volume
-      - /pub2/nrc/aging/snair_iccv_data:/food
+      - ${DATASET_PATH:-/dev/null}:/food
       # isaac-sim related volumes
       - ~/docker/isaac-sim/cache/kit:/isaac-sim/kit/cache/kit
-      - ~/docker/isaac-sim/cache/ov:/user/.cache/ov
-      - ~/docker/isaac-sim/cache/pip:/user/.cache/pip
-      - ~/docker/isaac-sim/cache/glcache:/user/.cache/nvidia/GLCache
-      - ~/docker/isaac-sim/cache/computecache:/user/.nv/ComputeCache
-      - ~/docker/isaac-sim/logs:/user/.nvidia-omniverse/logs
-      - ~/docker/isaac-sim/data:/user/.local/share/ov/data
-      - ~/docker/isaac-sim/documents:/user/Documents
+      - ~/docker/isaac-sim/cache/ov:/home/user/.cache/ov
+      - ~/docker/isaac-sim/cache/pip:/home/user/.cache/pip
+      - ~/docker/isaac-sim/cache/warp:/home/user/.cache/warp
+      - ~/docker/isaac-sim/cache/glcache:/home/user/.cache/nvidia/GLCache
+      - ~/docker/isaac-sim/cache/computecache:/home/user/.nv/ComputeCache
+      - ~/docker/isaac-sim/cache/omni-pycache:/home/user/.nvidia-omniverse/pycache
+      - ~/docker/isaac-sim/logs:/home/user/.nvidia-omniverse/logs
+      - ~/docker/isaac-sim/data:/home/user/.local/share/ov/data
+      - ~/docker/isaac-sim/documents:/home/user/Documents
     environment:
       - ACCEPT_EULA=Y
       - PRIVACY_CONSENT=Y

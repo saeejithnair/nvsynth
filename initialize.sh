@@ -39,3 +39,35 @@ echo "SHARED_GROUP_NAME=$SHARED_GROUP_NAME" >> ".env"
 echo "SHARED_GROUP_ID=$SHARED_GROUP_ID" >> ".env"
 echo "USERNAME=${USER}" >> ".env"
 echo "DOCKER_USERNAME=${DOCKER_USERNAME}" >> ".env"
+
+# Configure data directory
+printf "Please enter a path to your food dataset directory (empty for none): "
+read DATASET_PATH
+if [ -n "$DATASET_PATH" ]; then
+    echo DATASET_PATH=$DATASET_PATH >> .env
+else
+    echo "No path specified."
+fi
+
+# create required folders
+isaac_sim_folders=(
+    ~/docker/isaac-sim/cache/kit
+    ~/docker/isaac-sim/cache/ov
+    ~/docker/isaac-sim/cache/pip
+    ~/docker/isaac-sim/cache/warp
+    ~/docker/isaac-sim/cache/glcache
+    ~/docker/isaac-sim/cache/computecache
+    ~/docker/isaac-sim/cache/omni-pycache
+    ~/docker/isaac-sim/logs
+    ~/docker/isaac-sim/data
+    ~/docker/isaac-sim/documents
+)
+mkdir -p ${isaac_sim_folders[@]}
+
+# check that relevant folders are owned by the current user
+not_owned_by_user=$(find ~/docker/isaac-sim/ ! -user $(whoami) -print)
+if [ -n "$not_owned_by_user" ]; then
+    printf "\nWARNING: the following files/folders are not owned by you:\n"
+    echo $not_owned_by_user
+    printf "\nThis may lead to permission errors for isaac-sim. Try running: 'chown -R $(id -u):$(id -g) ~/docker'\n"
+fi
