@@ -5,6 +5,7 @@ FROM nvcr.io/nvidia/isaac-sim:2023.1.1 AS base
 
 # Project name.
 ENV PROJECT="nvsynth"
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Update system packages and install the basic ones
 RUN apt-get -y update && \
@@ -70,8 +71,16 @@ RUN if [ ! -z $SHARED_GROUP_ID ]; then \
 # kinda hacky but MUCH FASTER than recursive chown. see https://github.com/docker/for-linux/issues/388
 COPY --from=base --chown=${USER_ID}:${GROUP_ID} /isaac-sim /isaac-sim
 
+# # uncomment when using isaac-sim:2022.2.1
+# # TODO(howird): deprecate 2022.2.1
+# RUN rm /etc/vulkan/icd.d/nvidia_icd.json && \
+#     mv /isaac-sim/extscache/* /isaac-sim/kit/extscore
+
 USER $USER_NAME
 WORKDIR $USER_HOME
+
+# fixes bug where cache folder is created and owned by root
+RUN mkdir /isaac-sim/kit/cache/
 
 # Add local user binary folder to PATH variable
 ENV PATH="${PATH}:${USER_HOME}/.local/bin"
@@ -97,6 +106,7 @@ RUN chmod +x /home/user/entrypoint.sh && \
     chown $USER_NAME:$USER_NAME /home/user/setup_docker_env.sh
 
 # configure omni-provided python
+# we insert source to the start of our .bashrc, to run even when bash is non-interactive
 RUN sed -i '1s/^/source \/home\/user\/setup_docker_env.sh\n/' /home/user/.bashrc && \
     ln -s /isaac-sim/kit/python/bin/python3 /isaac-sim/kit/python/bin/python && \
     source /home/user/setup_docker_env.sh && \
