@@ -15,7 +15,7 @@ services:
       # food data volume
       - ${DATASET_PATH:-/dev/null}:/food
       # isaac-sim related volumes
-      - ~/docker/isaac-sim/cache/kit:/isaac-sim/kit/cache/kit
+      - ~/docker/isaac-sim/cache/kit:/isaac-sim/kit/cache
       - ~/docker/isaac-sim/cache/ov:/home/user/.cache/ov
       - ~/docker/isaac-sim/cache/pip:/home/user/.cache/pip
       - ~/docker/isaac-sim/cache/warp:/home/user/.cache/warp

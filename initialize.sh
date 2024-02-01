@@ -45,13 +45,12 @@ printf "Please enter a path to your food dataset directory (empty for none): "
 read DATASET_PATH
 if [ -n "$DATASET_PATH" ]; then
     echo DATASET_PATH=$DATASET_PATH >> .env
-else
-    echo "No path specified."
 fi
 
 # create required folders
 isaac_sim_folders=(
-    ~/docker/isaac-sim/cache/kit
+    ~/docker/isaac-sim/cache/kit/ogn_generated
+    ~/docker/isaac-sim/cache/kit/shadercache/common
     ~/docker/isaac-sim/cache/ov
     ~/docker/isaac-sim/cache/pip
     ~/docker/isaac-sim/cache/warp

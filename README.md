@@ -124,7 +124,7 @@ ssh -NL 8211:localhost:8211 -L 49100:localhost:49100 <ip of remote machine>
 docker compose exec isaac-sim bash -c "lsof -nP -iTCP -sTCP:LISTEN"
 # You should see an output similar to this:
 COMMAND PID USER   FD   TYPE   DEVICE SIZE/OFF NODE NAME
-kit      21 root  258u  IPv4 43127461      0t0  TCP *:48010 (LISTEN)
+kit      21 root  258u  IPv4 43127461      0t0  TCP *:49100 (LISTEN)
 kit      21 root  277u  IPv4 43151425      0t0  TCP *:8211 (LISTEN)
 ```
 
