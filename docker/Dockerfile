@@ -76,19 +76,16 @@ COPY --from=base --chown=${USER_ID}:${GROUP_ID} /isaac-sim /isaac-sim
 # RUN rm /etc/vulkan/icd.d/nvidia_icd.json && \
 #     mv /isaac-sim/extscache/* /isaac-sim/kit/extscore
 
-USER $USER_NAME
-WORKDIR $USER_HOME
-
 # Add local user binary folder to PATH variable
 ENV PATH="${PATH}:${USER_HOME}/.local/bin"
-
-# Set default shell to bash.
-SHELL ["/bin/bash", "-c"]
 
 ## -----------------------------------------
 ## Stage 3: Application building.
 ## -----------------------------------------
 FROM setup AS app
+
+# Set default shell to bash.
+SHELL ["/bin/bash", "-c"]
 
 # Copy dependency files
 COPY ./docker/deps/pip_requirements.txt /docker/deps/pip_requirements.txt
@@ -103,7 +100,7 @@ RUN chmod +x /home/user/entrypoint.sh && \
     chown $USER_NAME:$USER_NAME /home/user/setup_docker_env.sh
 
 # configure omni-provided python
-# we insert source to the start of our .bashrc, to run even when bash is non-interactive
+# we insert our script source to the start of our .bashrc, so it runs even when bash is non-interactive
 RUN sed -i '1s/^/source \/home\/user\/setup_docker_env.sh\n/' /home/user/.bashrc && \
     ln -s /isaac-sim/kit/python/bin/python3 /isaac-sim/kit/python/bin/python && \
     source /home/user/setup_docker_env.sh && \

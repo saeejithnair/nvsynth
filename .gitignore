@@ -2,8 +2,12 @@
 ### nvsynth .gitignore
 ###
 
-# local configs
+# locally generated files
 pyrightconfig.json
+
+# local configs
+.configs/
+logs.txt
 
 # output directories
 _fv_test_output/

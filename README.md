@@ -10,8 +10,8 @@ NutritionVerse-Synth: Synthetic generation of food scenes for dietary intake est
 - Docker Installation (check with: `docker run hello-world`)
 - [NVIDIA Container Toolkit](https://github.com/NVIDIA/nvidia-docker). (check: `nvidia-container-cli -V`)
 - A [NGC Account](https://docs.nvidia.com/ngc/ngc-overview/index.html#registering-activating-ngc-account) and an [NGC API Key](https://docs.nvidia.com/ngc/ngc-overview/index.html#generating-api-key)
-    - See this [this page](https://docs.nvidia.com/launchpad/ai/base-command-coe/latest/bc-coe-docker-basics-step-02.html)
-    - Make an account and configure/verify your docker credentials locally with: (`docker login nvcr.io`)
+  - See this [this page](https://docs.nvidia.com/launchpad/ai/base-command-coe/latest/bc-coe-docker-basics-step-02.html)
+  - Make an account and configure/verify your docker credentials locally with: (`docker login nvcr.io`)
 
 #### Set Up
 
@@ -40,12 +40,31 @@ docker compose build
 ### On Remote Machine (Streaming Server)
 
 - There are currently two usages of this docker container:
-  - (1) the first is simply running the base `isaac-sim` app
-  - (2) the second is running our custom python scripts in this repo
-  - (3) the third (default) is starting the docker container and running scripts/the app manually
+  - (1) the first (default) is starting the docker container and running scripts/the app manually
+    - this can be done via the provided vscode devcontainer as well
+  - (2) the second is simply running the base `isaac-sim` app
+  - (3) the third is running our custom python scripts in this repo
 
+#### (1) Running Isaac Sim Manually
 
-#### (1) Running the Base Isaac Sim App
+- Start the docker container:
+```bash
+docker compose up -d
+```
+
+- Enter the container
+```bash
+docker compose exec isaac-sim bash
+```
+
+- Run the a command to start the Isaac-Sim app
+```bash
+/isaac-sim/runheadless.webrtc.sh
+# OR
+python scripts/gen_random_scenes.py
+```
+
+#### (2) Running the Base Isaac Sim App
 
 - For the basic usage of the app, supply the following command to the service in the `docker-compose.yml`
 ```yaml
@@ -72,7 +91,7 @@ services:
 docker compose up
 ```
 
-#### (2) Running Isaac Sim via a Python Script
+#### (3) Running Isaac Sim via a Python Script
 
 - To run our scripts, we also modify the `docker-compose.yml` file by changing the target of our `Dockerfile` to `nvsynth` and add the command `"python path/to/script.py"`:
 ```yaml
@@ -86,30 +105,14 @@ services:
 docker compose up
 ```
 
-#### (3) Running Isaac Sim Manually
-
-- Start the docker container:
-```bash
-docker compose up -d
-```
-
-- Enter the container
-```bash
-docker compose exec isaac-sim bash
-```
-
-- Run the a command to start the Isaac-Sim app
-```bash
-/isaac-sim/runheadless.webrtc.sh
-# OR
-python scripts/gen_random_scenes.py
-```
-
 ### On Your Local Machine (Streaming Client)
 
 - Now that your the Omniverse Streamer is running on the remote machine, we can view the stream on our local machine
 
-- Open a local terminal and forward the stream URLs on the remote machine to your machine:
+- Open a local terminal and forward the necessary ports on the remote machine to your client machine:
+  - if you are using a vscode devcontainer, it may already be forwarding these ports for you automatically
+  - this will give you the error: `bind [127.0.0.1]:8211: Address already in use`
+  - in this case, you do not have to run this command
 ```bash
 ssh -NL 8211:localhost:8211 -L 49100:localhost:49100 <ip of remote machine>
 ```
@@ -128,7 +131,7 @@ kit      21 root  258u  IPv4 43127461      0t0  TCP *:49100 (LISTEN)
 kit      21 root  277u  IPv4 43151425      0t0  TCP *:8211 (LISTEN)
 ```
 
-- On your client machine try and ping the ports, that you have forwarded on your machine
+- On your client machine try and ping the ports that you have forwarded on your machine
   - you should get `404 Not Found` or `501 Not Implemented` errors, but you should not be getting `failed: Connection refused.`
 ```bash
 wget localhost:8211 # 404 Not Found
@@ -138,10 +141,15 @@ wget localhost:49100 # 501 Not Implemented
 - You can also monitor the logs in the container with:
 ```bash
 # filename is in format `kit_YYYYMMDD_HHMMSS.log` use tab to complete
+# inside docker container
+tail -f /home/user/.nvidia-omniverse/logs/Kit/Isaac-Sim/2023.1/kit_
+# outside of docker container
 tail -f ~/docker/isaac-sim/logs/Kit/Isaac-Sim/2023.1/kit_
 ```
 
-- If you get any permission errors when running isaac-sim, check if there are files/folders not owned by you with:
+- If you get any permissions errors when running isaac-sim, check if there are files/folders not owned by you with:
+  - If this does not resolve anything, and you are still running into permissions errors, there may be directories, that must be created as a non-root user before starting isaac-sim
+  - Try doing so using the [initialize script](./initialize.sh) and mapping them onto the docker container using the [docker config](./docker-compose.yml), then submit a PR
 ```bash
 find ~/docker/isaac-sim/ ! -user $(whoami) -print
 # If files are printed out, try running: chown -R $(id -u):$(id -g) ~/docker
