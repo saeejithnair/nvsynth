@@ -8,7 +8,7 @@
 # Note: most omni.* python modules will require you to be in the app env
 #   for you to run them anyways. Thus, this script shouldn't really be used
 #   outside of testing; it may break things. Beware.
-# This script was mostly a bi-product of getting linting to work in a vscode
+# This script was mostly a bi-product of getting pyright to work in a vscode
 #   devcontainer. See [this file](.devcontainer/gen_pyrightconfig.sh).
 #
 # Usage: 

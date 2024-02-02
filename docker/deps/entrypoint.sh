@@ -1,5 +1,5 @@
 #!/bin/bash
-source /home/user/setup_docker_env.sh
+source ~/setup_docker_env.sh
 
 # Run the CMD passed as command-line arguments or keep container open.
 if [ $# -eq 0 ]; then

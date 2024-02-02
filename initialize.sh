@@ -29,7 +29,14 @@ fi
 PROJECT_NAME="nvsynth"
 
 # Set username for non-root docker user.
-DOCKER_USERNAME="user"
+if [ "$USER_ID" != "1000" ] && [ "$GROUP_ID" != "1000" ]; then
+    DOCKER_USERNAME="user"
+else 
+    # When the uid abd gid are 1000, it means the current user
+    # was the first non-root user created. The base image already
+    # has user with uid=gid=1000, 'ubuntu', so we must use it.
+    DOCKER_USERNAME="ubuntu"
+fi
 
 > ".env"
 echo "COMPOSE_PROJECT_NAME=$PROJECT_NAME-${USER}" >> ".env"
@@ -47,7 +54,7 @@ if [ -n "$DATASET_PATH" ]; then
     echo DATASET_PATH=$DATASET_PATH >> .env
 fi
 
-# create required folders
+# Create required folders
 isaac_sim_folders=(
     ~/docker/isaac-sim/cache/kit/ogn_generated
     ~/docker/isaac-sim/cache/kit/shadercache/common
@@ -63,7 +70,7 @@ isaac_sim_folders=(
 )
 mkdir -p ${isaac_sim_folders[@]}
 
-# check that relevant folders are owned by the current user
+# Check that relevant folders are owned by the current user
 not_owned_by_user=$(find ~/docker/isaac-sim/ ! -user $(whoami) -print)
 if [ -n "$not_owned_by_user" ]; then
     printf "\nWARNING: the following files/folders are not owned by you:\n"

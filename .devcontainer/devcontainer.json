@@ -3,14 +3,20 @@
     "dockerComposeFile": ["../docker-compose.yml"],
     "service": "isaac-sim",
     "workspaceFolder": "/nvsynth",
-    "onCreateCommand": "bash /nvsynth/.devcontainer/gen_pyrightconfig.sh",
+    "onCreateCommand": "bash /nvsynth/scripts/docker/gen_pyrightconfig.sh",
     "customizations": {
         "vscode": {
             "extensions": [
                 "ms-python.python",
+                "tamasfe.even-better-toml",
                 "njpwerner.autodocstring",
                 "mechatroner.rainbow-csv"
-            ]
+            ],
+            "settings": {
+                "files.associations": {
+                    "*.kit": "toml"
+                }
+            }
         }
     }
-  }
+}

@@ -16,15 +16,15 @@ services:
       - ${DATASET_PATH:-/dev/null}:/food
       # isaac-sim related volumes
       - ~/docker/isaac-sim/cache/kit:/isaac-sim/kit/cache
-      - ~/docker/isaac-sim/cache/ov:/home/user/.cache/ov
-      - ~/docker/isaac-sim/cache/pip:/home/user/.cache/pip
-      - ~/docker/isaac-sim/cache/warp:/home/user/.cache/warp
-      - ~/docker/isaac-sim/cache/glcache:/home/user/.cache/nvidia/GLCache
-      - ~/docker/isaac-sim/cache/computecache:/home/user/.nv/ComputeCache
-      - ~/docker/isaac-sim/cache/omni-pycache:/home/user/.nvidia-omniverse/pycache
-      - ~/docker/isaac-sim/logs:/home/user/.nvidia-omniverse/logs
-      - ~/docker/isaac-sim/data:/home/user/.local/share/ov/data
-      - ~/docker/isaac-sim/documents:/home/user/Documents
+      - ~/docker/isaac-sim/cache/ov:/home/${DOCKER_USERNAME}/.cache/ov
+      - ~/docker/isaac-sim/cache/pip:/home/${DOCKER_USERNAME}/.cache/pip
+      - ~/docker/isaac-sim/cache/warp:/home/${DOCKER_USERNAME}/.cache/warp
+      - ~/docker/isaac-sim/cache/glcache:/home/${DOCKER_USERNAME}/.cache/nvidia/GLCache
+      - ~/docker/isaac-sim/cache/computecache:/home/${DOCKER_USERNAME}/.nv/ComputeCache
+      - ~/docker/isaac-sim/cache/omni-pycache:/home/${DOCKER_USERNAME}/.nvidia-omniverse/pycache
+      - ~/docker/isaac-sim/logs:/home/${DOCKER_USERNAME}/.nvidia-omniverse/logs
+      - ~/docker/isaac-sim/data:/home/${DOCKER_USERNAME}/.local/share/ov/data
+      - ~/docker/isaac-sim/documents:/home/${DOCKER_USERNAME}/Documents
     environment:
       - ACCEPT_EULA=Y
       - PRIVACY_CONSENT=Y

@@ -45,36 +45,34 @@ ENV HOST_USERNAME $HOST_USERNAME
 ENV HOSTNAME $HOSTNAME
 ENV USER_HOME="/home/${USER_NAME}"
 
-# Add a non-root docker user with passwordless sudo permissions and map this
-# docker user to the host user so that created files in the docker container
-# are owned by the host user.
-RUN addgroup --gid $GROUP_ID $USER_NAME && \
-    adduser \
-    --uid $USER_ID \
-    --ingroup $USER_NAME \
-    --home $USER_HOME \
-    --shell /bin/bash \
-    --disabled-password \
-    --gecos "" \
-    $USER_NAME && \
-    echo "${USER_NAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/nopasswd
+# Add a non-root docker user with same user and group id as the host user
+# so files created in the docker container are owned by the host.
+RUN if [ USER_NAME != "ubuntu" ]; then \
+        addgroup --gid $GROUP_ID $USER_NAME && \
+        adduser \
+        --uid $USER_ID \
+        --ingroup $USER_NAME \
+        --home $USER_HOME \
+        --shell /bin/bash \
+        --disabled-password \
+        --gecos "" \
+        $USER_NAME; \
+    fi;
+    
+# Give the user passwordless sudo permissions
+RUN echo "${USER_NAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/nopasswd
 
 # Create shared group with same GID as a shared host group (e.g. vip_user) and
 # add docker user to this secondary group so that they can access any shared
 # dirs that might need to be mounted.
 ENV SHARED_GROUP_NAME="host_shared"
 RUN if [ ! -z $SHARED_GROUP_ID ]; then \
-    groupadd -g $SHARED_GROUP_ID $SHARED_GROUP_NAME && \
-    usermod -a -G $SHARED_GROUP_NAME $USER_NAME; \
+        groupadd -g $SHARED_GROUP_ID $SHARED_GROUP_NAME && \
+        usermod -a -G $SHARED_GROUP_NAME $USER_NAME; \
     fi
 
-# kinda hacky but MUCH FASTER than recursive chown. see https://github.com/docker/for-linux/issues/388
+# MUCH FASTER than local recursive chown. see https://github.com/docker/for-linux/issues/388
 COPY --from=base --chown=${USER_ID}:${GROUP_ID} /isaac-sim /isaac-sim
-
-# # uncomment when using isaac-sim:2022.2.1
-# # TODO(howird): deprecate 2022.2.1
-# RUN rm /etc/vulkan/icd.d/nvidia_icd.json && \
-#     mv /isaac-sim/extscache/* /isaac-sim/kit/extscore
 
 # Add local user binary folder to PATH variable
 ENV PATH="${PATH}:${USER_HOME}/.local/bin"
@@ -89,21 +87,21 @@ SHELL ["/bin/bash", "-c"]
 
 # Copy dependency files
 COPY ./docker/deps/pip_requirements.txt /docker/deps/pip_requirements.txt
-COPY ./docker/deps/entrypoint.sh /home/user/entrypoint.sh
-COPY ./docker/deps/setup_docker_env.sh /home/user/setup_docker_env.sh
+COPY ./docker/deps/entrypoint.sh /home/${USER_NAME}/entrypoint.sh
+COPY ./docker/deps/setup_docker_env.sh /home/${USER_NAME}/setup_docker_env.sh
 
 USER root
-RUN chmod +x /home/user/entrypoint.sh && \
-    chown $USER_NAME:$USER_NAME /home/user/entrypoint.sh && \
-    chmod +x /home/user/setup_docker_env.sh && \
-    chown $USER_NAME:$USER_NAME /home/user/setup_docker_env.sh && \
-    chown $USER_NAME:$USER_NAME /home/user/setup_docker_env.sh
+RUN chmod +x /home/$USER_NAME/entrypoint.sh && \
+    chown $USER_NAME:$USER_NAME /home/$USER_NAME/entrypoint.sh && \
+    chmod +x /home/$USER_NAME/setup_docker_env.sh && \
+    chown $USER_NAME:$USER_NAME /home/$USER_NAME/setup_docker_env.sh && \
+    chown $USER_NAME:$USER_NAME /home/$USER_NAME/setup_docker_env.sh
 
 # configure omni-provided python
 # we insert our script source to the start of our .bashrc, so it runs even when bash is non-interactive
-RUN sed -i '1s/^/source \/home\/user\/setup_docker_env.sh\n/' /home/user/.bashrc && \
+RUN sed -i '1s/^/source \/home\/'"$USER_NAME"'\/setup_docker_env.sh\n/' /home/$USER_NAME/.bashrc && \
     ln -s /isaac-sim/kit/python/bin/python3 /isaac-sim/kit/python/bin/python && \
-    source /home/user/setup_docker_env.sh && \
+    source /home/$USER_NAME/setup_docker_env.sh && \
     python -m pip install --upgrade pip && \
     pip install -r /docker/deps/pip_requirements.txt
 
@@ -111,4 +109,4 @@ COPY . /nvsynth
 WORKDIR /nvsynth
 
 USER $USER_NAME
-ENTRYPOINT ["/bin/bash", "-i", "/home/user/entrypoint.sh"]
+ENTRYPOINT /bin/bash -i /home/$USER_NAME/entrypoint.sh
