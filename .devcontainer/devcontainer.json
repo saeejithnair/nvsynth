@@ -1,0 +1,26 @@
+{
+    "name": "nvsynth",
+    "dockerComposeFile": ["../docker-compose.yml"],
+    "service": "isaac-sim",
+    "workspaceFolder": "/nvsynth",
+    "onCreateCommand": "bash /nvsynth/scripts/docker/gen_pyrightconfig.sh && echo source /nvsynth/scripts/docker/dev_container_env.sh >> ~/.bashrc",
+    "forwardPorts": [ // TODO(howird): variable ports depending on user
+        8211,
+        49100
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "tamasfe.even-better-toml",
+                "njpwerner.autodocstring",
+                "mechatroner.rainbow-csv"
+            ],
+            "settings": {
+                "files.associations": {
+                    "*.kit": "toml"
+                }
+            }
+        }
+    }
+}

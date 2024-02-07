@@ -1,0 +1,11 @@
+curl
+git
+git-lfs
+libcurl4-openssl-dev
+nano
+openssh-client
+screen
+tmux
+neovim
+wget
+lsof

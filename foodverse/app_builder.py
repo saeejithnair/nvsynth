@@ -49,7 +49,7 @@ class FoodverseSceneBuilderConfig(InstantiateConfig):
     """The config for instantiating the user app."""
     sim: SimConfig = field(default_factory=SimConfig)
     """The config for instantiating the OV SimulationApp."""
-    display_gpu_id: int = 2
+    display_gpu_id: int = 0
     """The GPU ID to use for rendering."""
 
 

@@ -1,3 +1,22 @@
+###
+### nvsynth .gitignore
+###
+
+# locally generated files
+pyrightconfig.json
+
+# local configs
+.configs/
+logs.txt
+
+# output directories
+_fv_test_output/
+_output/
+
+###
+### Python .gitignore
+###
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
