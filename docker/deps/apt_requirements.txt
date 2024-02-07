@@ -6,6 +6,6 @@ nano
 openssh-client
 screen
 tmux
-vim-tiny
+neovim
 wget
 lsof

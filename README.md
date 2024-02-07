@@ -114,7 +114,7 @@ docker compose up
   - this will give you the error: `bind [127.0.0.1]:8211: Address already in use`
   - in this case, you do not have to run this command
 ```bash
-ssh -NL 8211:localhost:8211 -L 49100:localhost:49100 <ip of remote machine>
+ssh -NL 8211:localhost:<livestream client port> -L 49100:localhost:<livestream data port> <username>@<ip of remote machine>
 ```
 
 - Go to a browser and open: http://127.0.0.1:8211/streaming/webrtc-demo/?server=127.0.0.1
@@ -151,8 +151,13 @@ tail -f ~/docker/isaac-sim/logs/Kit/Isaac-Sim/2023.1/kit_
   - If this does not resolve anything, and you are still running into permissions errors, there may be directories, that must be created as a non-root user before starting isaac-sim
   - Try doing so using the [initialize script](./initialize.sh) and mapping them onto the docker container using the [docker config](./docker-compose.yml), then submit a PR
 ```bash
-find ~/docker/isaac-sim/ ! -user $(whoami) -print
-# If files are printed out, try running: chown -R $(id -u):$(id -g) ~/docker
+find ~/.docker/isaac-sim/ ! -user $(whoami) -print
+# If files are printed out, try running: chown -R $(id -u):$(id -g) ~/.docker/isaac-sim/
+```
+
+- Isaac sim docs:
+```
+python3 -m http.server -d /isaac-sim/docs/py <port>
 ```
 
 ## Set Up for Lavazza

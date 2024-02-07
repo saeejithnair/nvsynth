@@ -32,10 +32,25 @@ PROJECT_NAME="nvsynth"
 if [ "$USER_ID" != "1000" ] && [ "$GROUP_ID" != "1000" ]; then
     DOCKER_USERNAME="user"
 else 
-    # When the uid abd gid are 1000, it means the current user
+    # When the uid and gid are 1000, it means the current user
     # was the first non-root user created. The base image already
     # has user with uid=gid=1000, 'ubuntu', so we must use it.
     DOCKER_USERNAME="ubuntu"
+fi
+
+# Configure data directory
+printf "Please enter an absolute path to your food dataset directory (empty for none): "
+read DATASET_PATH
+
+if [ -n "$DATASET_PATH" ]; then
+    if [[ "$DATASET_PATH" != /* ]]; then
+        echo "The provided path, '$DATASET_PATH', is not an absolute path. Exiting."
+        exit 1
+    fi
+    if [ ! -d "$DATASET_PATH" ]; then
+        echo "The provided path, '$DATASET_PATH', is not a directory. Exiting."
+        exit 1
+    fi
 fi
 
 > ".env"
@@ -46,34 +61,32 @@ echo "SHARED_GROUP_NAME=$SHARED_GROUP_NAME" >> ".env"
 echo "SHARED_GROUP_ID=$SHARED_GROUP_ID" >> ".env"
 echo "USERNAME=${USER}" >> ".env"
 echo "DOCKER_USERNAME=${DOCKER_USERNAME}" >> ".env"
-
-# Configure data directory
-printf "Please enter a path to your food dataset directory (empty for none): "
-read DATASET_PATH
 if [ -n "$DATASET_PATH" ]; then
     echo DATASET_PATH=$DATASET_PATH >> .env
 fi
 
 # Create required folders
 isaac_sim_folders=(
-    ~/docker/isaac-sim/cache/kit/ogn_generated
-    ~/docker/isaac-sim/cache/kit/shadercache/common
-    ~/docker/isaac-sim/cache/ov
-    ~/docker/isaac-sim/cache/pip
-    ~/docker/isaac-sim/cache/warp
-    ~/docker/isaac-sim/cache/glcache
-    ~/docker/isaac-sim/cache/computecache
-    ~/docker/isaac-sim/cache/omni-pycache
-    ~/docker/isaac-sim/logs
-    ~/docker/isaac-sim/data
-    ~/docker/isaac-sim/documents
+    ~/.docker/isaac-sim/cache/kit/ogn_generated
+    ~/.docker/isaac-sim/cache/kit/shadercache/common
+    ~/.docker/isaac-sim/cache/ov
+    ~/.docker/isaac-sim/cache/pip
+    ~/.docker/isaac-sim/cache/warp
+    ~/.docker/isaac-sim/cache/glcache
+    ~/.docker/isaac-sim/cache/computecache
+    ~/.docker/isaac-sim/cache/omni-pycache
+    ~/.docker/isaac-sim/logs
+    ~/.docker/isaac-sim/local/share/ov/data
+    ~/.docker/isaac-sim/documents
 )
 mkdir -p ${isaac_sim_folders[@]}
 
 # Check that relevant folders are owned by the current user
-not_owned_by_user=$(find ~/docker/isaac-sim/ ! -user $(whoami) -print)
+not_owned_by_user=$(find ~/.docker/isaac-sim/ ! -user $(whoami) -print)
 if [ -n "$not_owned_by_user" ]; then
     printf "\nWARNING: the following files/folders are not owned by you:\n"
     echo $not_owned_by_user
-    printf "\nThis may lead to permission errors for isaac-sim. Try running: 'chown -R $(id -u):$(id -g) ~/docker'\n"
+    printf "\nThis may lead to permission errors for isaac-sim. Try running: 'chown -R $(id -u):$(id -g) ~/.docker/isaac-sim'\n"
 fi
+
+echo "Done setting up .env file for user, '$USER', with uid, '$UID'."

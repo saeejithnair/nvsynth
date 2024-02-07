@@ -13,7 +13,7 @@
 #
 # Usage: 
 #   - within our docker container run:
-#       `source /nvsynth/docker/omni_pythonpath.sh`
+#       `source /nvsynth/scripts/docker/omni_pythonpath.sh`
 #   - you should now be able to import *some* more packages in python:
 #       `python -c "import pxr"`
 
