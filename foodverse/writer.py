@@ -856,8 +856,8 @@ class FoodverseWriter(Writer):
             }
             received_prims_set.add(prim_name)
 
-        if received_prims_set != expected_prims_set:
-            raise ValueError(
-                f"Received unexpected prims: {received_prims_set - expected_prims_set}")
+        diff = received_prims_set - expected_prims_set
+        if diff:
+            raise ValueError(f"Received unexpected prims: {diff}")
 
         return metadata
