@@ -49,10 +49,10 @@ def get_repo_working_dir(path_to_repo="."):
 
 # Dictionary storing the path of models, grouped based on model type.
 MODELS_DIR = {
-    "food": "assets/food",
-    "scene": "assets/scene",
-    "plate": "assets/tableware",
-    # "misc": "assets/misc/ycb/Axis_Aligned_Physics"
+    "food": "/assets/food",
+    "scene": "/nvsynth/assets/scene",
+    "plate": "/nvsynth/assets/tableware",
+    # "misc": "/nvsynth/assets/misc/ycb/Axis_Aligned_Physics"
 }
 
 

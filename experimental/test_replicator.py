@@ -13,7 +13,7 @@ import omni
 camera1_pos = [(0, 1, 5),(5, 1, 5),(-5, 1, 5),]
 camera2_pos = [(0, 5, 0),(5, 5, 0),(-5, 5, 0),]
 
-PLATE_USD_PATH = "/home/smnair/work/nutrition/vip-omni/assets/plate/plate.usd"
+PLATE_USD_PATH = "/nvsynth/assets/plate/plate.usd"
 # PLATE_USD_PATH = "/pub2/nrc/aging/snair_cvis_data/id-12-carrot-9g/textured_obj.usd"
 # This allows us to run replicator, which will update the random
 # parameters and save out the data for as many frames as listed
@@ -45,7 +45,7 @@ def run_with_sim_context():
 
     simulation_context.stop()
 
-MUSTARTD_USD_PATH = '/home/smnair/work/nutrition/vip-omni/assets/mustard/006_mustard_bottle.usd'
+MUSTARTD_USD_PATH = '/nvsynth/assets/mustard/006_mustard_bottle.usd'
 MUSTARD_SCALE=3
 PLATE_SCALE = 3
 def main(usd_path):
