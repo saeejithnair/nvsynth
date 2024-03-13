@@ -32,6 +32,6 @@ if __name__ == "__main__":
     # )
     config = tyro.cli(FoodverseSceneBuilderConfig)
     config.scene.root_output_dir = (
-        "/home/smnair/work/nutrition/vip-omni/_fv_test_output"
+        "/nvsynth/_fv_test_output"
     )
     main(config)

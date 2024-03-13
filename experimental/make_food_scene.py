@@ -17,8 +17,8 @@ import omni.replicator.core as rep
 from pxr import UsdPhysics, PhysxSchema
 
 # ** MODIFY THIS TO YOUR ABSOLUTE PATH **
-env_path = "/home/smnair/work/nutrition/vip-omni/assets/scene/simple_room/simple_room.usd"
-plate_path = "/home/smnair/work/nutrition/vip-omni/assets/tableware/plate/plate.usd"
+env_path = "/nvsynth/assets/scene/simple_room/simple_room.usd"
+plate_path = "/nvsynth/assets/tableware/plate/plate.usd"
 
  
 plate_prim_path = "/Replicator/Ref_Xform/Ref/model/mesh"
@@ -337,7 +337,7 @@ def main(yaml_path):
 
         writer = rep.WriterRegistry.get("BasicWriter")
         writer.initialize(
-            output_dir="/home/smnair/work/nutrition/vip-omni/_output/",
+            output_dir="/nvsynth/_output/",
             semantic_types=["class", "food_type"],
             rgb=True,
             bounding_box_2d_tight=True,
@@ -350,7 +350,7 @@ def main(yaml_path):
             normals=True,
         )
         # writer.initialize(
-        #     output_dir="/home/smnair/work/nutrition/vip-omni/_output/",
+        #     output_dir="/nvsynth/_output/",
         #     bbox_height_threshold=5,
         #     fully_visible_threshold=0.75,
         #     omit_semantic_type=True

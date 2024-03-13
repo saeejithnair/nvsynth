@@ -11,7 +11,7 @@ scene:
       steps: 3
   layer1:
     name: "wing"
-    usd_path: "/home/smnair/work/nutrition/vip-omni/assets/food/id-21-chicken-wing-27g/textured_obj.usd"
+    usd_path: "/assets/food/id-21-chicken-wing-27g/textured_obj.usd"
     scale: [50, 70]
     num: 12
     position: [[0, 0, 30], [5, 2, 0]]

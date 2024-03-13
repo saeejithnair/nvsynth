@@ -8,7 +8,7 @@ from omni.isaac.kit import SimulationApp
 
 kit = SimulationApp({'headless': False, 'renderer': "RayTracedLighting", 'num_frames': 100})
 
-food_path = "/pub4/iyevenko/Documents/vip-omni/assets/food/{}/poly_obj.usd"
+food_path = "/assets/food/{}/poly_obj.usd"
 
 
 def get_objects(yaml_path):
@@ -54,8 +54,8 @@ def run_orchestrator():
     rep.orchestrator.stop()
 
 
-usd_path = "/pub4/iyevenko/Documents/vip-omni/assets/scene/simple_room/simple_room.usd"
-plate_path = "/pub4/iyevenko/Documents/vip-omni/assets/tableware/plate/plate.usd"
+usd_path = "/nvsynth/assets/scene/simple_room/simple_room.usd"
+plate_path = "/nvsynth/assets/tableware/plate/plate.usd"
 
 
 import omni.replicator.core as rep
@@ -95,7 +95,7 @@ with rep.new_layer():
 
 
     writer = rep.WriterRegistry.get("BasicWriter")
-    writer.initialize(output_dir="/pub4/iyevenko/Documents/vip-omni/_output/", rgb=True)
+    writer.initialize(output_dir="/nvsynth/_output/", rgb=True)
     writer.attach([render_product])
 
     run_orchestrator()
