@@ -26,7 +26,7 @@ with rep.new_layer():
     # Initialize and attach writer
     writer = rep.WriterRegistry.get("BasicWriter")
 
-    writer.initialize(output_dir="/home/iyevenko/Documents/vip-omni/_output", rgb=True,   bounding_box_2d_tight=True)
+    writer.initialize(output_dir="/nvsynth/_output", rgb=True,   bounding_box_2d_tight=True)
 
     writer.attach([render_product])
 

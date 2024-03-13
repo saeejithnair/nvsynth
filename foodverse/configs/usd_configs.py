@@ -48,10 +48,10 @@ def get_repo_working_dir(path_to_repo="."):
 
 # Dictionary storing the path of models, grouped based on model type.
 MODELS_DIR = {
-    "food": "assets/food",
-    "scene": "assets/scene",
-    "plate": "assets/tableware",
-    # "misc": "assets/misc/ycb/Axis_Aligned_Physics"
+    "food": "/assets/food",
+    "scene": "/nvsynth/assets/scene",
+    "plate": "/nvsynth/assets/tableware",
+    # "misc": "/nvsynth/assets/misc/ycb/Axis_Aligned_Physics"
 }
 
 
@@ -102,9 +102,9 @@ def register_models(models_dir_dict) -> Dict[str, ModelConfig]:
 
     for model_type in models_dir_dict:
         # Model dir relative to repo.
-        model_dir_rel = models_dir_dict[model_type]
+        model_dir_abs = models_dir_dict[model_type]
         # Model dir absolute path.
-        model_dir_abs = f"{repo_working_dir}/{model_dir_rel}"
+        # model_dir_abs = f"{repo_working_dir}/{model_dir_rel}"
 
         # Get all subfolder paths in model dir.
         subfolders = [f.path for f in os.scandir(model_dir_abs) if f.is_dir()]
