@@ -10,6 +10,7 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 import omni.graph.core as og
 import omni.isaac.core as isaac_core
+import omni.isaac.core.utils.bounds as bounds
 import omni.replicator.core as rep
 from omni.isaac.kit import SimulationApp
 from PIL import Image, ImageEnhance
@@ -154,7 +155,7 @@ class FoodverseScene(Scene):
         """
 
         # Create bounding box cache for faster retrieval of prim bounds.
-        self.bb_cache = isaac_core.utils.bounds.create_bbox_cache()
+        self.bb_cache = bounds.create_bbox_cache()
 
         # TODO(snair): Check if it's necessary to wrap this in a new layer.
         with rep.new_layer(name="StaticLayer"):
