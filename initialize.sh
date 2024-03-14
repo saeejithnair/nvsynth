@@ -16,13 +16,18 @@ print_info() {
 SHARED_GROUP_NAME="vip_user"
 SHARED_GROUP_ID=$(getent group $SHARED_GROUP_NAME | cut -d: -f3)
 
+if [ ! -n "$SHARED_GROUP_ID" ]; then
+    print_error "No shared group found with name: $SHARED_GROUP_NAME."
+    exit 1
+fi
+
 # Get UID and GID.
 USER_ID=$(id -u)
 GROUP_ID=$(id -g)
 
 # Validate that the user is a member of the group.
 if ! groups $USER | grep &>/dev/null "\b$SHARED_GROUP_NAME\b"; then
-    echo "User ${USER} with UID ${USER_ID} is not a member of group ${SHARED_GROUP_NAME} with GID ${SHARED_GROUP_ID}"
+    print_error "User ${USER} with UID '${USER_ID}' is not a member of group '${SHARED_GROUP_NAME}' with GID '${SHARED_GROUP_ID}'"
     exit 1
 fi
 
@@ -39,18 +44,24 @@ else
 fi
 
 # Configure data directory
-printf "Please enter an absolute path to your food dataset directory (empty for none): "
-read DATASET_PATH
-
-if [ -n "$DATASET_PATH" ]; then
+if [ "$#" -eq 1 ]; then
+    DATASET_PATH=$1
     if [[ "$DATASET_PATH" != /* ]]; then
-        echo "The provided path, '$DATASET_PATH', is not an absolute path. Exiting."
+        print_error "The provided path, '$DATASET_PATH', is not an absolute path. Exiting."
         exit 1
     fi
     if [ ! -d "$DATASET_PATH" ]; then
-        echo "The provided path, '$DATASET_PATH', is not a directory. Exiting."
+        print_error "The provided path, '$DATASET_PATH', is not a directory. Exiting."
         exit 1
     fi
+    print_info "Found food dataset directory, '$DATASET_PATH'."
+elif [ "$#" -eq 0 ]; then
+    print_warning "You have not provided an absolute path to your food dataset directory."
+    print_warning "This is allowed, but not recommended. You may rerun this script with:"
+    print_warning "    bash $0 <absolute path to food dataset>"
+else
+    print_error "$# arguments provided. You should either provide 1 absolute path or nothing."
+    exit 1
 fi
 
 > ".env"
@@ -82,11 +93,12 @@ isaac_sim_folders=(
 mkdir -p ${isaac_sim_folders[@]}
 
 # Check that relevant folders are owned by the current user
-not_owned_by_user=$(find ~/.docker/isaac-sim/ ! -user $(whoami) -print)
+not_owned_by_user=$(find ~/.docker/isaac-sim/ ! -user $(whoami) -printf "%p, ")
 if [ -n "$not_owned_by_user" ]; then
-    printf "\nWARNING: the following files/folders are not owned by you:\n"
-    echo $not_owned_by_user
-    printf "\nThis may lead to permission errors for isaac-sim. Try running: 'chown -R $(id -u):$(id -g) ~/.docker/isaac-sim'\n"
+    print_warning "The following files/folders are not owned by you:"
+    print_warning "$not_owned_by_user"
+    print_warning "This may lead to permission errors for isaac-sim. Try running: 'chown -R $(id -u):$(id -g) ~/.docker/isaac-sim'"
 fi
 
-echo "Done setting up .env file for user, '$USER', with uid, '$UID'."
+print_info "Done setting up .env file for user, '$USER', with uid, '$UID'."
+
