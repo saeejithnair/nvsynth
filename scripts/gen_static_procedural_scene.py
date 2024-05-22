@@ -13,6 +13,9 @@ if TYPE_CHECKING:
 def main(
     config: FoodverseSceneBuilderConfig,
 ):
+    if config.scene.scene_items is None:
+        raise ValueError("Scene items config must be provided to generate a static scene.")
+
     scene_builder: FoodverseSceneBuilder = config.setup()
     fv_scene: FoodverseScene = scene_builder.build()
 
@@ -29,8 +32,5 @@ if __name__ == "__main__":
                 FoodverseSceneBuilderConfig
             ]
         ]
-    )
-    config.scene.root_output_dir = (
-        "/home/smnair/work/nutrition/vip-omni/_fv_test_output"
     )
     main(config)
