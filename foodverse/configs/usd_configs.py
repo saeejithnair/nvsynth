@@ -49,7 +49,7 @@ def get_repo_working_dir(path_to_repo="."):
 
 # Dictionary storing the path of models, grouped based on model type.
 MODELS_DIR = {
-    "food": "/assets/food",
+    "food": "/nvsynth/assets/food",
     "scene": "/nvsynth/assets/scene",
     "plate": "/nvsynth/assets/tableware",
     # "misc": "/nvsynth/assets/misc/ycb/Axis_Aligned_Physics"
@@ -127,10 +127,9 @@ def register_models(models_dir_dict) -> Dict[str, ModelConfig]:
             model_path = usds[0]
             if model_type == "food":
                 model_uid = int(re.search(r"^id_(\d+)_*", model_label).group(1))
-                scale_factor = food_scale_factors[model_label]
             else:
                 model_uid = None
-                scale_factor = 1.0
+            scale_factor = 1.0
 
             models[model_label] = ModelConfig(
                 label=model_label,

@@ -1,7 +1,7 @@
 ## -----------------------------------------
 ## Stage 1: Base dependencies installation.
 ## -----------------------------------------
-FROM nvcr.io/nvidia/isaac-sim:2023.1.1 AS base
+FROM nvcr.io/nvidia/isaac-sim:2022.1.1 AS base
 
 # Project name.
 ENV PROJECT="nvsynth"

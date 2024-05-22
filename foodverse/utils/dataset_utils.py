@@ -166,7 +166,7 @@ def map_food_model_label_to_class_name(model_label: str) -> str:
     if not model_label.startswith("id_"):
         raise ValueError("Food model label must start with 'id_'")
 
-    pattern = r"id_\d+_(.+)_\d+g"
+    pattern = r"id_\d+_(.+)"
     match = re.search(pattern, model_label)
 
     if not match:

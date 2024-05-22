@@ -31,6 +31,6 @@ if __name__ == "__main__":
         ]
     )
     config.scene.root_output_dir = (
-        "/nvsynth/_fv_test_output"
+        "./gen_static_procedural_scene_outputs"
     )
     main(config)
