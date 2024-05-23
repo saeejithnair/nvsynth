@@ -1,3 +1,4 @@
+from typing import List
 import copy
 import os
 import re
@@ -101,25 +102,26 @@ def register_models(models_dir_dict) -> Dict[str, ModelConfig]:
     food_scale_factors = parse_csv(f"{repo_working_dir}/configs/scale_factors.csv")
 
     for model_type in models_dir_dict:
-        # Model dir relative to repo.
-        model_dir_rel = models_dir_dict[model_type]
         # Model dir absolute path.
-        model_dir_abs = f"{repo_working_dir}/{model_dir_rel}"
+        model_root = os.path.join(repo_working_dir, models_dir_dict[model_type])
 
         # Get all subfolder paths in model dir.
-        subfolders = [f.path for f in os.scandir(model_dir_abs) if f.is_dir()]
+        model_dirs: List[str] = list(set([
+            os.path.dirname(usd_fp)
+            for usd_fp in glob(os.path.join(model_root, "**", "*.usd"), recursive=True)
+        ]))
 
-        for subfolder in subfolders:
-            model_label = os.path.basename(subfolder)
+        for model_dir in model_dirs:
+            model_label = os.path.basename(model_dir)
 
             if "-" in model_label:
                 # Replace all hyphens in string with underscores.
                 model_label = model_label.replace("-", "_")
 
             # Find USD file within subfolder
-            usds = glob(f"{subfolder}/*.usd")
+            usds = glob(f"{model_dir}/*.usd")
             if len(usds) == 0:
-                print(f"WARNING: No USD file found in {subfolder}")
+                print(f"WARNING: No USD file found in {model_dir}")
                 continue
 
             model_path = usds[0]
