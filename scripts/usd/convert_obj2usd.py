@@ -60,9 +60,11 @@ def asset_convert(root_dir: str):
     # input checks
     assert type(root_dir) == str, f"type(root_dir)={type(root_dir)}"
     assert os.path.isdir(root_dir), f"root_dir={root_dir}"
-    supported_file_formats = [".stl", ".obj", ".fbx"]
+    supported_file_formats = ["stl", "obj", "fbx"]
     for input_path in sorted(glob.glob(os.path.join(root_dir, "**", "*.obj"), recursive=True)):
         model_format = os.path.splitext(input_path)[1]
+        assert model_format.startswith('.')
+        model_format = model_format[1:]
         if model_format in supported_file_formats:
             output_path = os.path.splitext(input_path)[0] + f"_{model_format}.usd"
             if not os.path.exists(output_path):
@@ -74,6 +76,8 @@ def asset_convert(root_dir: str):
                 print(f"---Added {output_path}")
             else:
                 print(f"Output path {output_path} already exists.")
+        else:
+            print(f"Unsupported model format {model_format}.")
 
 
 if __name__ == "__main__":
