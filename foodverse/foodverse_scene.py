@@ -237,7 +237,7 @@ class FoodverseScene(Scene):
             bounding_box_3d=True,
             occlusion=False,
             camera_params=True,
-            distance_to_camera=False,
+            distance_to_camera=True,
             normals=False,
             amodal_segmentation=False,
         )
@@ -327,9 +327,7 @@ class FoodverseScene(Scene):
         shutil.copytree(food_model_dirname, tmp_food_dir_path)
 
         # Glob for path to the texture files in the temp food model directory.
-        texture_file_paths = glob.glob(
-            os.path.join(tmp_food_dir_path, "textures/*.jpg")
-        )
+        texture_file_paths = glob.glob(os.path.join(tmp_food_dir_path, "textures/*.[jp][pn]g"))
         # Filter out the roughness texture files.
         texture_file_paths = list(
             filter(lambda x: "roughness" not in x, texture_file_paths)
@@ -704,16 +702,20 @@ class FoodverseScene(Scene):
 
             # Load the food item into the scene.
             pose = PoseConfig(position=CartesianPosition(x=x_pos, y=y_pos))
-            food_prim, food_rigid_prim = self.load_food_model_into_scene(
-                food_model,
-                prim_name,
-                pose=pose,
-                augmented_food_usd_path=tmp_food_usd_path,
-            )
+            try:
+                food_prim, food_rigid_prim = self.load_food_model_into_scene(
+                    food_model,
+                    prim_name,
+                    pose=pose,
+                    augmented_food_usd_path=tmp_food_usd_path,
+                )
 
-            self.food_prims.append(food_prim)
-            self.food_prim_names.append(prim_name)
-            self.food_rigid_prims.append(food_rigid_prim)
+                self.food_prims.append(food_prim)
+                self.food_prim_names.append(prim_name)
+                self.food_rigid_prims.append(food_rigid_prim)
+            except Exception as e:
+                print(f"Failed to load food item {prim_name}: {e}")
+                continue
 
         # Run simulation to let food items settle on plate.
         plate_is_empty = self.drop_food_onto_plate()
@@ -807,9 +809,9 @@ class FoodverseScene(Scene):
 
                 if item_idx % capture_placement_every_n_items == 0:
                     rep.orchestrator.step()
-                    self.writer.write_data(prim_names_to_expect=prim_names)
-
-
+                    # self.writer.write_data(prim_names_to_expect=prim_names)
+        
+        self.writer.write_data(prim_names_to_expect=prim_names)
 
     def generate_persistent_food_items(self, food_items: Optional[List[FoodItemConfig]] = None, capture_falling_every_n_steps: Optional[int] = None) -> None:
         """Generates a static scene with predefined food items.

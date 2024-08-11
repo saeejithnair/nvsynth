@@ -1,6 +1,7 @@
 import bpy
 import os
 import math
+import tyro
 
 # Generates GIFs from OBJ files using Blender for Nutritionverse 2.0 dataset
 # Function to clear all objects from the scene
@@ -78,7 +79,7 @@ def render_gif(obj_path, output_path):
     os.rmdir(frame_folder)
 
 # Function to traverse the directory structure and process OBJ files
-def traverse_directories(base_dir, output_dir):
+def traverse_directories(base_dir: str = "/pub0/daniel/Complete_version_3/Blender_files", output_dir: str = "/pub0/daniel/Complete_version_3/rendered_gifs"):
     for root, dirs, files in os.walk(base_dir):
         for file in files:
             if file.endswith(".obj"):
@@ -89,10 +90,6 @@ def traverse_directories(base_dir, output_dir):
                 print(f"Rendering {obj_path} to {output_path}")
                 render_gif(obj_path, output_path)
 
-# Set your base directory and output directory
-base_dir = "/pub0/daniel/Complete_version_3/Blender_files"
-output_dir = "/pub0/daniel/Complete_version_3/rendered_gifs"
-
 # Run the script
 if __name__ == "__main__":
-    traverse_directories(base_dir, output_dir)
+    tyro.cli(traverse_directories)
