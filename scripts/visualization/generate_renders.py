@@ -2,6 +2,7 @@ import bpy
 import os
 import math
 import tyro
+import re
 
 # Generates GIFs from OBJ files using Blender for Nutritionverse 2.0 dataset
 # Function to clear all objects from the scene
@@ -85,7 +86,17 @@ def traverse_directories(base_dir: str = "/pub0/daniel/Complete_version_3/Blende
             if file.endswith(".obj"):
                 obj_path = os.path.join(root, file)
                 rel_path = os.path.relpath(root, base_dir)
-                output_path = os.path.join(output_dir, f"{rel_path}")
+                
+                # Use regex to replace brackets with underscores in the output path
+                safe_rel_path = re.sub(r'[\(\)]', '_', rel_path)
+                output_path = os.path.join(output_dir, f"{safe_rel_path}")
+                
+                # Check if the GIF already exists
+                gif_path = f"{output_path}.gif"
+                if os.path.exists(gif_path):
+                    print(f"Skipping {obj_path} as {gif_path} already exists")
+                    continue
+                
                 os.makedirs(os.path.dirname(output_path), exist_ok=True)
                 print(f"Rendering {obj_path} to {output_path}")
                 render_gif(obj_path, output_path)
