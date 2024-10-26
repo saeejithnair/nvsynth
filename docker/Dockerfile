@@ -47,7 +47,7 @@ ENV USER_HOME="/home/${USER_NAME}"
 
 # Add a non-root docker user with same user and group id as the host user
 # so files created in the docker container are owned by the host.
-RUN if [ USER_NAME != "ubuntu" ]; then \
+RUN if [ $USER_NAME != "ubuntu" ]; then \
         addgroup --gid $GROUP_ID $USER_NAME && \
         adduser \
         --uid $USER_ID \
