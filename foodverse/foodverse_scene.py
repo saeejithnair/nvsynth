@@ -460,7 +460,7 @@ class FoodverseScene(Scene):
 
         # 0.01 is a qualitatively derived heuristic to make the food mesh
         # sizes look realistic in comparison to the plate size.
-        scale = scale * 0.01 if scale else food_model.scale * 0.01
+        scale = scale if scale else food_model.scale
         orientation = pose.orientation.as_list(radians=True) if pose.orientation is not None else [
             random.uniform(0, 2 * np.pi),
             random.uniform(0, 2 * np.pi),
