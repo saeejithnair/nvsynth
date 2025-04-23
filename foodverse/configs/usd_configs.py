@@ -98,7 +98,8 @@ def register_models(models_dir_dict) -> Dict[str, ModelConfig]:
     models = {}
     repo_working_dir = get_repo_working_dir()
 
-    food_scale_factors = parse_csv(f"{repo_working_dir}/configs/scale_factors.csv")
+    scale_factors_path = "/pub0/smnair/nutrition/dataset_0425/scale_factors.csv"
+    food_scale_factors = parse_csv(scale_factors_path)
 
     for model_type in models_dir_dict:
         # Model dir relative to repo.

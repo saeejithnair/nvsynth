@@ -87,9 +87,13 @@ def traverse_directories(base_dir: str = "/pub0/daniel/Complete_version_3/Blende
                 obj_path = os.path.join(root, file)
                 rel_path = os.path.relpath(root, base_dir)
                 
-                # Use regex to replace brackets with underscores in the output path
-                safe_rel_path = re.sub(r'[\(\)]', '_', rel_path)
-                output_path = os.path.join(output_dir, f"{safe_rel_path}")
+                # Use regex to replace brackets with underscores and spaces with underscores in the output path
+                safe_rel_path = re.sub(r'[\(\)\s]', '_', rel_path)
+                
+                # Also handle spaces in the filename
+                safe_filename = re.sub(r'[\(\)\s]', '_', os.path.splitext(file)[0])
+                
+                output_path = os.path.join(output_dir, safe_rel_path, safe_filename)
                 
                 # Check if the GIF already exists
                 gif_path = f"{output_path}.gif"

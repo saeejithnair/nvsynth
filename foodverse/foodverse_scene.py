@@ -33,6 +33,22 @@ from foodverse.writer import FoodverseWriter
 FOOD_PRIM_PATH = r"\/Replicator\/Ref_Xform.*\/Ref"
 
 
+def _get_category_from_label(label: str) -> str:
+    # Assumes label format like 'id_XXX_category_name_YYYg' or 'id_XXX_category_name'
+    parts = label.split('_')
+    if len(parts) < 3:
+        return "unknown"  # Or raise an error for unexpected formats
+    category_parts = []
+    # Start from the third part (index 2), which should be the start of the category
+    for part in parts[2:]:
+        # Stop if we hit the weight part (e.g., '192g')
+        if part.endswith('g') and part[:-1].isdigit():
+            break
+        category_parts.append(part)
+    # Re-join parts of the category name if it contained underscores
+    return "_".join(category_parts) if category_parts else "unknown"
+
+
 class FoodverseScene(Scene):
     def __init__(self, kit: SimulationApp, config: FoodverseSceneConfig) -> None:
         super().__init__(kit)
@@ -49,6 +65,7 @@ class FoodverseScene(Scene):
         self.plate_scale = config.plate_scale
         self.num_cameras = config.num_cameras
         self.num_scenes = config.num_scenes
+        self.unique_categories_only = config.unique_categories_only
 
         # Set the seed for the random number generator.
         # If no seed is provided, use the current time.
@@ -674,9 +691,35 @@ class FoodverseScene(Scene):
         r = self.plate_bbox.radius * 0.5
 
         # Load food items into the scene.
+        added_categories = set()
+        available_models = list(self.food_models) # Copy to allow removal
+
         for i in range(size):
-            # Get a random food item from the dataset.
-            food_model = random.choice(self.food_models)
+            chosen_model = None
+            if self.unique_categories_only:
+                # Filter models to exclude those from already added categories
+                eligible_models = [m for m in available_models if _get_category_from_label(m.label) not in added_categories]
+                if not eligible_models:
+                    print(f"Warning: Could not find unique category for item {i+1}/{size}. Stopping placement.")
+                    break # No more unique categories available
+                
+                chosen_model = random.choice(eligible_models)
+                category = _get_category_from_label(chosen_model.label)
+                added_categories.add(category)
+                # Optional: remove all models of this category from available_models to speed up future filtering
+                # available_models = [m for m in available_models if _get_category_from_label(m.label) != category]
+            else:
+                # Original behavior: pick any random model
+                if not available_models:
+                    print("Warning: No models available to choose from.") # Should not happen with default logic
+                    break
+                chosen_model = random.choice(available_models)
+
+            if chosen_model is None:
+                # Should only happen if unique_categories_only is true and no eligible models were found
+                continue
+
+            food_model = chosen_model
 
             # A scene can have multiple copies of the same food item. To
             # distinguish between them, we append the index of the food item
