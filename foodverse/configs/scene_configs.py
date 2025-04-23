@@ -156,3 +156,5 @@ class FoodverseSceneConfig:
     """Number of scenes to generate."""
     scene_items: Optional[Union[Path, SceneItems]] = None
     """Scene items or path to yaml config file."""
+    unique_categories_only: bool = False
+    """If True, only load one item per category in random generation."""

@@ -1,6 +1,8 @@
 import bpy
 import os
 import math
+import tyro
+import re
 
 # Generates GIFs from OBJ files using Blender for Nutritionverse 2.0 dataset
 # Function to clear all objects from the scene
@@ -78,21 +80,31 @@ def render_gif(obj_path, output_path):
     os.rmdir(frame_folder)
 
 # Function to traverse the directory structure and process OBJ files
-def traverse_directories(base_dir, output_dir):
+def traverse_directories(base_dir: str = "/pub0/daniel/Complete_version_3/Blender_files", output_dir: str = "/pub0/daniel/Complete_version_3/rendered_gifs"):
     for root, dirs, files in os.walk(base_dir):
         for file in files:
             if file.endswith(".obj"):
                 obj_path = os.path.join(root, file)
                 rel_path = os.path.relpath(root, base_dir)
-                output_path = os.path.join(output_dir, f"{rel_path}")
+                
+                # Use regex to replace brackets with underscores and spaces with underscores in the output path
+                safe_rel_path = re.sub(r'[\(\)\s]', '_', rel_path)
+                
+                # Also handle spaces in the filename
+                safe_filename = re.sub(r'[\(\)\s]', '_', os.path.splitext(file)[0])
+                
+                output_path = os.path.join(output_dir, safe_rel_path, safe_filename)
+                
+                # Check if the GIF already exists
+                gif_path = f"{output_path}.gif"
+                if os.path.exists(gif_path):
+                    print(f"Skipping {obj_path} as {gif_path} already exists")
+                    continue
+                
                 os.makedirs(os.path.dirname(output_path), exist_ok=True)
                 print(f"Rendering {obj_path} to {output_path}")
                 render_gif(obj_path, output_path)
 
-# Set your base directory and output directory
-base_dir = "/pub0/daniel/Complete_version_3/Blender_files"
-output_dir = "/pub0/daniel/Complete_version_3/rendered_gifs"
-
 # Run the script
 if __name__ == "__main__":
-    traverse_directories(base_dir, output_dir)
+    tyro.cli(traverse_directories)

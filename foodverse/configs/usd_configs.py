@@ -98,7 +98,8 @@ def register_models(models_dir_dict) -> Dict[str, ModelConfig]:
     models = {}
     repo_working_dir = get_repo_working_dir()
 
-    food_scale_factors = parse_csv(f"{repo_working_dir}/configs/scale_factors.csv")
+    scale_factors_path = "/pub0/smnair/nutrition/dataset_0425/scale_factors.csv"
+    food_scale_factors = parse_csv(scale_factors_path)
 
     for model_type in models_dir_dict:
         # Model dir relative to repo.
@@ -125,10 +126,16 @@ def register_models(models_dir_dict) -> Dict[str, ModelConfig]:
             model_path = usds[0]
             if model_type == "food":
                 model_uid = int(re.search(r"^id_(\d+)_*", model_label).group(1))
-                scale_factor = food_scale_factors[model_label]
+                if model_label in food_scale_factors:
+                    scale_factor = food_scale_factors[model_label]
+                else:
+                    scale_factor = 100.0
             else:
                 model_uid = None
-                scale_factor = 1.0
+                if model_type == "plate":
+                    scale_factor = 2.5
+                else:
+                    scale_factor = 1.0
 
             models[model_label] = ModelConfig(
                 label=model_label,

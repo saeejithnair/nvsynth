@@ -9,15 +9,21 @@ Usage (for CVIS data):
     ./isaac_sim/python.sh convert_obj2usd.py \
         --root_folder /pub2/nrc/aging/snair_cvis_data
 """
+from typing import Optional
 import argparse
 import asyncio
 import os
+import glob
 
-import omni
 from omni.isaac.kit import SimulationApp
 
 
-async def convert(in_file, out_file, load_materials=False):
+async def convert(in_file: str, out_file: str, load_materials: Optional[bool] = False):
+    # input checks
+    assert type(in_file) == str, f"type(in_file)={type(in_file)}"
+    assert os.path.isfile(in_file), f"in_file={in_file}"
+    assert type(out_file) == str, f"type(out_file)={type(out_file)}"
+    assert os.path.isdir(os.path.dirname(out_file)), f"out_file={out_file}"
     # This import causes conflicts when global
     import omni.kit.asset_converter
 
@@ -50,31 +56,28 @@ async def convert(in_file, out_file, load_materials=False):
     return success
 
 
-def asset_convert(args):
+def asset_convert(root_dir: str):
+    # input checks
+    assert type(root_dir) == str, f"type(root_dir)={type(root_dir)}"
+    assert os.path.isdir(root_dir), f"root_dir={root_dir}"
     supported_file_formats = ["stl", "obj", "fbx"]
-    subfolders = [f.path for f in os.scandir(args.root_folder) if f.is_dir()]
-
-    for folder in subfolders:
-        print(f"\nConverting folder {folder}...")
-
-        (result, models) = omni.client.list(folder)
-        for i, entry in enumerate(models):
-            model = str(entry.relative_path)
-            model_name = os.path.splitext(model)[0]
-            model_format = (os.path.splitext(model)[1])[1:]
-            # Supported input file formats
-            if model_format in supported_file_formats:
-                input_model_path = folder + "/" + model
-                converted_model_path = (
-                    folder + "/" + model_name + "_" + model_format + ".usd"
+    for input_path in sorted(glob.glob(os.path.join(root_dir, "**", "*.obj"), recursive=True)):
+        model_format = os.path.splitext(input_path)[1]
+        assert model_format.startswith('.')
+        model_format = model_format[1:]
+        if model_format in supported_file_formats:
+            output_path = os.path.splitext(input_path)[0] + f"_{model_format}.usd"
+            if not os.path.exists(output_path):
+                status = asyncio.get_event_loop().run_until_complete(
+                    convert(input_path, output_path, True)
                 )
-                if not os.path.exists(converted_model_path):
-                    status = asyncio.get_event_loop().run_until_complete(
-                        convert(input_model_path, converted_model_path, True)
-                    )
-                    if not status:
-                        print(f"ERROR Status is {status}")
-                    print(f"---Added {converted_model_path}")
+                if not status:
+                    print(f"ERROR Status is {status}")
+                print(f"---Added {output_path}")
+            else:
+                print(f"Output path {output_path} already exists.")
+        else:
+            print(f"Unsupported model format {model_format}.")
 
 
 if __name__ == "__main__":
@@ -96,7 +99,7 @@ if __name__ == "__main__":
 
     # Ensure Omniverse Kit is launched via SimulationApp before
     # asset_convert() is called.
-    asset_convert(args)
+    asset_convert(args.root_folder)
 
     # cleanup
     kit.close()

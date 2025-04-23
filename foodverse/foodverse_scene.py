@@ -33,6 +33,22 @@ from foodverse.writer import FoodverseWriter
 FOOD_PRIM_PATH = r"\/Replicator\/Ref_Xform.*\/Ref"
 
 
+def _get_category_from_label(label: str) -> str:
+    # Assumes label format like 'id_XXX_category_name_YYYg' or 'id_XXX_category_name'
+    parts = label.split('_')
+    if len(parts) < 3:
+        return "unknown"  # Or raise an error for unexpected formats
+    category_parts = []
+    # Start from the third part (index 2), which should be the start of the category
+    for part in parts[2:]:
+        # Stop if we hit the weight part (e.g., '192g')
+        if part.endswith('g') and part[:-1].isdigit():
+            break
+        category_parts.append(part)
+    # Re-join parts of the category name if it contained underscores
+    return "_".join(category_parts) if category_parts else "unknown"
+
+
 class FoodverseScene(Scene):
     def __init__(self, kit: SimulationApp, config: FoodverseSceneConfig) -> None:
         super().__init__(kit)
@@ -49,6 +65,7 @@ class FoodverseScene(Scene):
         self.plate_scale = config.plate_scale
         self.num_cameras = config.num_cameras
         self.num_scenes = config.num_scenes
+        self.unique_categories_only = config.unique_categories_only
 
         # Set the seed for the random number generator.
         # If no seed is provided, use the current time.
@@ -237,7 +254,7 @@ class FoodverseScene(Scene):
             bounding_box_3d=True,
             occlusion=False,
             camera_params=True,
-            distance_to_camera=False,
+            distance_to_camera=True,
             normals=False,
             amodal_segmentation=False,
         )
@@ -327,9 +344,7 @@ class FoodverseScene(Scene):
         shutil.copytree(food_model_dirname, tmp_food_dir_path)
 
         # Glob for path to the texture files in the temp food model directory.
-        texture_file_paths = glob.glob(
-            os.path.join(tmp_food_dir_path, "textures/*.jpg")
-        )
+        texture_file_paths = glob.glob(os.path.join(tmp_food_dir_path, "textures/*.[jp][pn]g"))
         # Filter out the roughness texture files.
         texture_file_paths = list(
             filter(lambda x: "roughness" not in x, texture_file_paths)
@@ -445,7 +460,7 @@ class FoodverseScene(Scene):
 
         # 0.01 is a qualitatively derived heuristic to make the food mesh
         # sizes look realistic in comparison to the plate size.
-        scale = scale * 0.01 if scale else food_model.scale * 0.01
+        scale = scale if scale else food_model.scale
         orientation = pose.orientation.as_list(radians=True) if pose.orientation is not None else [
             random.uniform(0, 2 * np.pi),
             random.uniform(0, 2 * np.pi),
@@ -676,9 +691,35 @@ class FoodverseScene(Scene):
         r = self.plate_bbox.radius * 0.5
 
         # Load food items into the scene.
+        added_categories = set()
+        available_models = list(self.food_models) # Copy to allow removal
+
         for i in range(size):
-            # Get a random food item from the dataset.
-            food_model = random.choice(self.food_models)
+            chosen_model = None
+            if self.unique_categories_only:
+                # Filter models to exclude those from already added categories
+                eligible_models = [m for m in available_models if _get_category_from_label(m.label) not in added_categories]
+                if not eligible_models:
+                    print(f"Warning: Could not find unique category for item {i+1}/{size}. Stopping placement.")
+                    break # No more unique categories available
+                
+                chosen_model = random.choice(eligible_models)
+                category = _get_category_from_label(chosen_model.label)
+                added_categories.add(category)
+                # Optional: remove all models of this category from available_models to speed up future filtering
+                # available_models = [m for m in available_models if _get_category_from_label(m.label) != category]
+            else:
+                # Original behavior: pick any random model
+                if not available_models:
+                    print("Warning: No models available to choose from.") # Should not happen with default logic
+                    break
+                chosen_model = random.choice(available_models)
+
+            if chosen_model is None:
+                # Should only happen if unique_categories_only is true and no eligible models were found
+                continue
+
+            food_model = chosen_model
 
             # A scene can have multiple copies of the same food item. To
             # distinguish between them, we append the index of the food item
@@ -704,16 +745,20 @@ class FoodverseScene(Scene):
 
             # Load the food item into the scene.
             pose = PoseConfig(position=CartesianPosition(x=x_pos, y=y_pos))
-            food_prim, food_rigid_prim = self.load_food_model_into_scene(
-                food_model,
-                prim_name,
-                pose=pose,
-                augmented_food_usd_path=tmp_food_usd_path,
-            )
+            try:
+                food_prim, food_rigid_prim = self.load_food_model_into_scene(
+                    food_model,
+                    prim_name,
+                    pose=pose,
+                    augmented_food_usd_path=tmp_food_usd_path,
+                )
 
-            self.food_prims.append(food_prim)
-            self.food_prim_names.append(prim_name)
-            self.food_rigid_prims.append(food_rigid_prim)
+                self.food_prims.append(food_prim)
+                self.food_prim_names.append(prim_name)
+                self.food_rigid_prims.append(food_rigid_prim)
+            except Exception as e:
+                print(f"Failed to load food item {prim_name}: {e}")
+                continue
 
         # Run simulation to let food items settle on plate.
         plate_is_empty = self.drop_food_onto_plate()
@@ -807,9 +852,9 @@ class FoodverseScene(Scene):
 
                 if item_idx % capture_placement_every_n_items == 0:
                     rep.orchestrator.step()
-                    self.writer.write_data(prim_names_to_expect=prim_names)
-
-
+                    # self.writer.write_data(prim_names_to_expect=prim_names)
+        
+        self.writer.write_data(prim_names_to_expect=prim_names)
 
     def generate_persistent_food_items(self, food_items: Optional[List[FoodItemConfig]] = None, capture_falling_every_n_steps: Optional[int] = None) -> None:
         """Generates a static scene with predefined food items.

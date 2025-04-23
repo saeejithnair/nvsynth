@@ -17,6 +17,7 @@ def main(
     fv_scene: FoodverseScene = scene_builder.build()
 
     fv_scene.generate_static_procedural_scene(capture_placement_every_n_items=1)
+    # fv_scene.generate_persistent_food_items()
 
     fv_scene.cleanup()
 
@@ -31,6 +32,6 @@ if __name__ == "__main__":
         ]
     )
     config.scene.root_output_dir = (
-        "/home/smnair/work/nutrition/vip-omni/_fv_test_output"
+        "/home/smnair/work/nutrition/vip-omni/nutritionv2"
     )
     main(config)

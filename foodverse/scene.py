@@ -6,6 +6,8 @@ import omni.graph.core as og
 import omni.replicator.core as rep
 from omni.isaac.core import World
 from pxr import PhysxSchema, Usd, UsdGeom, UsdPhysics, UsdShade
+import numpy as np
+import random
 
 from foodverse.configs import sim_configs as sc
 from foodverse.utils import geometry_utils as gu
@@ -229,27 +231,45 @@ class Scene:
 
         Args:
             look_at_prim: Prim to look at
-            pos: Initial position of the camera
+            pos: Initial position of the camera (used only if num_cameras > 1)
             num_cameras: Number of cameras to generate
-            radius: Radius of the fibonacci sphere. NOTE: Cameras will still
-                be generated slightly beyond the sphere.
+            radius: Radius of the fibonacci sphere (used only if num_cameras > 1).
+                NOTE: Cameras will still be generated slightly beyond the sphere.
             focal_length: Focal length of the camera
             resolution: Resolution of the camera (height, width)
 
         Returns:
             List of render products to call writer.attach(...) on
         """
-        pts = gu.make_views(pos, num_cameras, radius)
         render_products = []
-        for idx, pt in enumerate(pts):
-            focal_length_scale = 1.0 if idx % 2 == 0 else 1.5
-            camera = rep.create.camera(
-                position=pt,
-                look_at=str(look_at_prim.GetPrimPath()),
-                focal_length=focal_length * focal_length_scale,
-            )
+        if num_cameras == 1:
+            # Use a fixed top-ish view looking down at the plate
+            # Assuming look_at_prim is centered near origin, place camera
+            # slightly offset and elevated. Adjust as needed.
+            rand_x = random.uniform(-0.2, 0.2)
+            rand_y = random.uniform(-0.2, 0.2)
+            rand_z = random.uniform(2.3, 2.7)
+            randomized_pos = (rand_x, rand_y, rand_z)
 
+            camera = rep.create.camera(
+                position=randomized_pos,
+                look_at=str(look_at_prim.GetPrimPath()),
+                focal_length=focal_length, # Use default focal length
+            )
             render_product = rep.create.render_product(camera, resolution)
             render_products.append(render_product)
+        else:
+            # Original logic for multiple cameras
+            pts = gu.make_views(pos, num_cameras, radius)
+            for idx, pt in enumerate(pts):
+                # Keep the alternating focal length for variety in multi-cam setup
+                focal_length_scale = 1.0 if idx % 2 == 0 else 1.5
+                camera = rep.create.camera(
+                    position=pt,
+                    look_at=str(look_at_prim.GetPrimPath()),
+                    focal_length=focal_length * focal_length_scale,
+                )
+                render_product = rep.create.render_product(camera, resolution)
+                render_products.append(render_product)
 
         return render_products

@@ -1,0 +1,120 @@
+# tyro YAML.
+!dataclass:SceneItems
+food_items:
+procedural_items:
+  # - !dataclass:CircularPlacement
+  #   description: Center (Crab)
+  #   height: 0
+  #   increment_angle: 180
+  #   model_label: id_39_Crab_1_1g
+  #   num_items: 1
+  #   orientation: !dataclass:EulerOrientation
+  #     pitch: 0
+  #     roll: 0
+  #     yaw: 0
+  #   radius: 0.05
+  #   start_angle: 0
+
+  # - !dataclass:CircularPlacement
+  #   description: Center (Lobster)
+  #   height: 0
+  #   increment_angle: 180
+  #   model_label: id_62_Lobster_1_1g
+  #   num_items: 1
+  #   orientation: !dataclass:EulerOrientation
+  #     pitch: 0
+  #     roll: 0
+  #     yaw: 180
+  #   radius: 0.05
+  #   start_angle: 180
+
+  - !dataclass:CircularPlacement
+    description: Table (Omelette)
+    height: -0.02
+    increment_angle: 360
+    model_label: id_71_Omelet_1_1g
+    num_items: 1
+    orientation: !dataclass:EulerOrientation
+      pitch: 0
+      roll: 0
+      yaw: 0
+    radius: 0.09
+    start_angle: 0
+
+  - !dataclass:CircularPlacement
+    description: Table (Pancake)
+    height: -0.02
+    increment_angle: 360
+    model_label: id_73_Pancake_6_1g
+    num_items: 1
+    orientation: !dataclass:EulerOrientation
+      pitch: 0
+      roll: 0
+      yaw: 90
+    radius: 0.06
+    start_angle: 135
+
+  - !dataclass:CircularPlacement
+    description: Table (Kiwi)
+    height: -0.03
+    increment_angle: 30
+    model_label: id_60_Kiwi_4_1g
+    num_items: 1
+    orientation: !dataclass:EulerOrientation
+      pitch: 0
+      roll: 0
+      yaw: 160
+    radius: 0.07
+    start_angle: 290
+  
+  - !dataclass:CircularPlacement
+    description: Table (Kiwi)
+    height: -0.03
+    increment_angle: 30
+    model_label: id_60_Kiwi_4_1g
+    num_items: 1
+    orientation: !dataclass:EulerOrientation
+      pitch: 0
+      roll: 0
+      yaw: 30
+    radius: 0.06
+    start_angle: 245
+
+  - !dataclass:CircularPlacement
+    description: Table (Papaya)
+    height: -0.02
+    increment_angle: 360
+    model_label: id_74_Papaya_4_1g
+    num_items: 1
+    orientation: !dataclass:EulerOrientation
+      pitch: 0
+      roll: 0
+      yaw: 0
+    radius: 0.2
+    start_angle: 180
+
+  - !dataclass:CircularPlacement
+    description: Table (Grape)
+    height: -0.02
+    increment_angle: 360
+    model_label: id_53_Grapes_1_1g
+    num_items: 1
+    orientation: !dataclass:EulerOrientation
+      pitch: 0
+      roll: 0
+      yaw: 30
+    radius: 0.1
+    start_angle: 240
+  
+  - !dataclass:CircularPlacement
+    description: Table (Grape)
+    height: -0.02
+    increment_angle: 360
+    model_label: id_53_Grapes_4_1g
+    num_items: 1
+    orientation: !dataclass:EulerOrientation
+      pitch: 0
+      roll: 0
+      yaw: 30
+    radius: 0.12
+    start_angle: 215
